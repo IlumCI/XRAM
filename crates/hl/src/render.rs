@@ -130,7 +130,7 @@ mod tests {
     fn money_stays_legible_across_four_orders_of_magnitude() {
         assert_eq!(fmt_money(None), "-");
         assert_eq!(fmt_money(Some(9)), "$0.09");
-        assert_eq!(fmt_money(Some(3_169_00)), "$3k");
+        assert_eq!(fmt_money(Some(316_900)), "$3k");
         assert_eq!(fmt_money(Some(4_100)), "$41");
     }
 
