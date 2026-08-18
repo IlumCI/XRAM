@@ -16,9 +16,30 @@ pub struct Row {
     pub observations: usize,
     pub decision: Decision,
     pub report: CrowdingReport,
-    /// Most recent reward reading, in cents. Its meaning is per-source and stated in
-    /// the report header: a bounty size on GitHub, value per entering team on Kaggle.
-    pub value_cents: Option<u64>,
+    /// Most recent reward reading. Its meaning is per-source, which is why the unit
+    /// travels with it — rendering a yield's basis points as dollars turned 3.52% APY
+    /// into "$3".
+    pub value: Option<u64>,
+    pub unit: ValueUnit,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ValueUnit {
+    /// Cents: a bounty size, or prize per entering team.
+    Money,
+    /// Hundredths of a percent: an annualised rate.
+    BasisPoints,
+}
+
+impl ValueUnit {
+    /// Pick the unit from the niche id, since the reading's meaning follows its source.
+    pub fn for_niche(niche_id: &str) -> ValueUnit {
+        if niche_id.starts_with("defi:") {
+            ValueUnit::BasisPoints
+        } else {
+            ValueUnit::Money
+        }
+    }
 }
 
 pub fn signal_tag(s: Signal) -> &'static str {
@@ -54,7 +75,8 @@ pub fn decision_table(rows: &[Row]) -> String {
         observations,
         decision: d,
         report: r,
-        value_cents,
+        value,
+        unit,
     } in rows
     {
         let basis: Vec<&str> = r.metrics.iter().map(|m| m.metric.label()).collect();
@@ -64,13 +86,24 @@ pub fn decision_table(rows: &[Row]) -> String {
             signal_tag(d.signal),
             observations,
             fmt_days(d.runway_days),
-            fmt_money(*value_cents),
+            fmt_value(*value, *unit),
             r.weekly_decay * 100.0,
             if basis.is_empty() { "none yet".into() } else { basis.join(",") }
         ));
         out.push_str(&format!("{:<34} {}\n", "", d.reason));
     }
     out
+}
+
+/// A reading rendered in its own unit.
+pub fn fmt_value(value: Option<u64>, unit: ValueUnit) -> String {
+    match unit {
+        ValueUnit::Money => fmt_money(value),
+        ValueUnit::BasisPoints => match value {
+            None => "-".into(),
+            Some(bps) => format!("{:.2}%", bps as f64 / 100.0),
+        },
+    }
 }
 
 /// Money, at whatever precision is legible. Sub-dollar values keep their cents because
@@ -124,11 +157,23 @@ mod tests {
             observations: 3,
             decision: d,
             report: r,
-            value_cents: None,
+            value: None,
+            unit: ValueUnit::Money,
         }]);
         assert!(table.contains("    3"), "raw count must appear: {table}");
         assert!(table.contains("unknown"));
         assert!(table.contains("none yet"));
+    }
+
+    #[test]
+    fn a_rate_is_rendered_as_a_rate_not_as_dollars() {
+        // 352 basis points is 3.52% APY. Rendered as money it read "$3", which is both
+        // wrong and plausible enough to be believed.
+        assert_eq!(fmt_value(Some(352), ValueUnit::BasisPoints), "3.52%");
+        assert_eq!(fmt_value(Some(352), ValueUnit::Money), "$3");
+        assert_eq!(fmt_value(None, ValueUnit::BasisPoints), "-");
+        assert_eq!(ValueUnit::for_niche("defi:Base:aave-v3:USDC"), ValueUnit::BasisPoints);
+        assert_eq!(ValueUnit::for_niche("gh:owner/repo"), ValueUnit::Money);
     }
 
     #[test]

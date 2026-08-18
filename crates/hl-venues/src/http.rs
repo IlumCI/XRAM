@@ -14,6 +14,27 @@ pub struct HttpResponse {
     pub body: String,
 }
 
+/// Cap on a response body.
+///
+/// `ureq::Response::into_string` refuses anything past 10 MB, which silently killed the
+/// yield source: the pool listing is a single ~11 MB document. Reading through the
+/// reader instead lifts that, and the cap is kept explicit so a runaway response still
+/// cannot exhaust memory.
+pub const MAX_BODY_BYTES: usize = 64 * 1024 * 1024;
+
+/// Read a response body without `into_string`'s 10 MB ceiling.
+fn read_body(resp: ureq::Response) -> Result<String> {
+    use std::io::Read;
+    let mut buf = Vec::with_capacity(64 * 1024);
+    resp.into_reader()
+        .take(MAX_BODY_BYTES as u64 + 1)
+        .read_to_end(&mut buf)?;
+    if buf.len() > MAX_BODY_BYTES {
+        bail!("response exceeds {MAX_BODY_BYTES} byte cap");
+    }
+    Ok(String::from_utf8_lossy(&buf).into_owned())
+}
+
 pub trait Transport: Send + Sync {
     fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<HttpResponse>;
 }
@@ -118,13 +139,13 @@ impl Transport for UreqTransport {
         match req.call() {
             Ok(resp) => Ok(HttpResponse {
                 status: resp.status(),
-                body: resp.into_string()?,
+                body: read_body(resp)?,
             }),
             // A 403 or 429 is data, not a failure: it is the venue telling us how
             // crowded its own rate limit is.
             Err(ureq::Error::Status(code, resp)) => Ok(HttpResponse {
                 status: code,
-                body: resp.into_string().unwrap_or_default(),
+                body: read_body(resp).unwrap_or_default(),
             }),
             Err(e) => bail!("http error for {url}: {e}"),
         }

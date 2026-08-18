@@ -18,7 +18,8 @@ use hl_probe::{crowding::CrowdingMeter, policy, PolicyConfig};
 use hl_scout::{Scout, SightingIndex};
 use hl_venues::{
     github::GithubNiche, github_search::GithubSearchNiche, http::UreqTransport, huggingface::HfNiche,
-    kaggle::KaggleSource, GithubSearchSource, GithubSource, HuggingFaceSource, SimNiche, SimSource,
+    kaggle::KaggleSource, DefiLlamaSource, GithubSearchSource, GithubSource, HuggingFaceSource,
+    SimNiche, SimSource,
 };
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -96,6 +97,8 @@ fn default_limits() -> HashMap<String, QuotaLimits> {
     m.insert("huggingface".into(), QuotaLimits::new(30, 2_000, u64::MAX));
     // Kaggle documents no public rate limit; two listing pages an hour is negligible.
     m.insert("kaggle".into(), QuotaLimits::new(10, 500, u64::MAX));
+    // DefiLlama is free and unauthenticated, and one request covers every pool.
+    m.insert("defillama".into(), QuotaLimits::new(5, 300, u64::MAX));
     m
 }
 
@@ -106,6 +109,7 @@ fn build_sources(
     HuggingFaceSource,
     GithubSearchSource,
     KaggleSource,
+    DefiLlamaSource,
     Option<GithubSource>,
 ) {
     let mut hf: Vec<HfNiche> = cfg.hf_model_tags.iter().map(|t| HfNiche::models(t)).collect();
@@ -131,6 +135,7 @@ fn build_sources(
         HuggingFaceSource::new(hf, Box::new(UreqTransport::default())),
         GithubSearchSource::new(searches, Box::new(UreqTransport::default())),
         KaggleSource::new(Box::new(UreqTransport::default())),
+        DefiLlamaSource::new(Box::new(UreqTransport::default())),
         (!repos.is_empty())
             .then(|| GithubSource::new(repos, Box::new(UreqTransport::default()))),
     )
@@ -167,9 +172,17 @@ fn poll(
         return (Vec::new(), errors);
     }
     let out = match src.observe(since_ms) {
-        Ok(o) => o,
+        Ok(o) => {
+            // A source that returns nothing is not necessarily broken, but it is never
+            // what we expect, and staying quiet about it is how a dead source goes
+            // unnoticed for days.
+            if o.is_empty() {
+                errors.push(format!("{}: returned no observations", src.id()));
+            }
+            o
+        }
         Err(e) => {
-            errors.push(format!("{}: {e}", src.id()));
+            errors.push(format!("{}: {e:#}", src.id()));
             Vec::new()
         }
     };
@@ -255,7 +268,8 @@ fn demo(ledger: &Ledger, days: f64) -> Result<()> {
             label: format!("{} ({})", n.id, n.notes),
             decision,
             report,
-            value_cents: None,
+            value: None,
+            unit: render::ValueUnit::Money,
         });
     }
 
@@ -345,7 +359,8 @@ fn watch(
             label: n.label.clone(),
             decision,
             report,
-            value_cents: None,
+            value: None,
+            unit: render::ValueUnit::Money,
         });
     }
     print!("{}", render::decision_table(&rows));
@@ -397,7 +412,8 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
 
     if dry_run {
         println!("dry run: {} request(s) would be made\n", cfg.request_cost());
-        let (hf, gh, kaggle, repos) = build_sources(&cfg);
+        let (hf, gh, kaggle, yields, repos) = build_sources(&cfg);
+        println!("  {} yield pool(s) via defillama", yields.filter.max_pools);
         for n in hf.niches()?.iter().chain(gh.niches()?.iter()) {
             println!("  {}", n.id);
         }
@@ -420,7 +436,7 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
     let before = store.len();
     let mut errors: Vec<String> = Vec::new();
 
-    let (hf, gh_search, kaggle, gh_repos) = build_sources(&cfg);
+    let (hf, gh_search, kaggle, yields, gh_repos) = build_sources(&cfg);
 
     let mut all: Vec<Observation> = Vec::new();
     let mut record = |src: &dyn Source, provider: &str, cost: u32| -> Result<()> {
@@ -449,6 +465,7 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
 
     record(&hf, "huggingface", hf.request_cost())?;
     record(&gh_search, "github-search", gh_search.request_cost())?;
+    record(&yields, "defillama", yields.request_cost())?;
     if kaggle.request_cost() > 0 {
         record(&kaggle, "kaggle", kaggle.request_cost())?;
     }
@@ -503,17 +520,18 @@ fn report(state: &Path, out: &Path, config: &Path) -> Result<()> {
             Some(s) if !s.label.is_empty() && s.label != id => format!("{id}  ({})", s.label),
             _ => id.clone(),
         };
-        let value_cents = obs
+        let value = obs
             .iter()
             .filter(|o| o.niche_id == id && o.reward_cents.is_some())
             .max_by_key(|o| o.ts_ms)
             .and_then(|o| o.reward_cents);
         rows.push(render::Row {
             observations: obs.iter().filter(|o| o.niche_id == id).count(),
+            unit: render::ValueUnit::for_niche(&id),
             label,
             decision: d,
             report: r,
-            value_cents,
+            value,
         });
     }
     // Undetermined niches sort last: they are pending, not promising.
@@ -544,7 +562,8 @@ fn report(state: &Path, out: &Path, config: &Path) -> Result<()> {
          `Insufficient` means not enough data yet, which is not the same as a bad niche. \
          Runway is the shorter of the measured trend (against the fast end of its \
          confidence interval) and any published deadline. VALUE is the latest reward \
-         reading: bounty size for GitHub niches, prize per entering team for Kaggle.\n\n\
+         reading in its own unit: bounty size for GitHub, prize per entering team for \
+         Kaggle, annualised rate for yield pools.\n\n\
          ```\n{}```\n\n\
          Watching {} tag(s) and {} search(es). Regenerated by the scheduled sweep.\n",
         obs.len(),

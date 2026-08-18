@@ -8,7 +8,7 @@ is becoming and rotates out before the margin collapses. Everyone optimises thei
 almost nobody measures its half-life, so they all exit late.
 
 ```sh
-cargo test                      # 136 tests, no network
+cargo test                      # 144 tests, no network
 cargo run --bin hl -- demo      # full loop against niches with known half-lives
 cargo run --bin hl -- sweep     # poll every source, store, refresh REPORT.md
 ```
@@ -33,6 +33,11 @@ against whatever opportunity set exists; it cannot manufacture opportunity.
 - [docs/KILL-LIST.md](docs/KILL-LIST.md) — seven strategies considered, and the fact
   that killed each
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — how the code works
+
+The largest source is **yield pools**: a rate that decays as capital floods in is
+precisely what this measures, so APY maps onto the reward metric and TVL onto competitor
+density with no new machinery. Unlike work markets, yield markets have no identity gate,
+no terms to accept, no per-item human step and no minimum position.
 
 Sources are all free. Kaggle needs a token (`KAGGLE_KEY`, as a repository secret for the
 scheduled run); everything else works unauthenticated, though a GitHub token raises

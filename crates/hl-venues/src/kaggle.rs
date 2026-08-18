@@ -38,21 +38,32 @@ pub fn auth_token() -> Option<String> {
 pub struct KaggleSource {
     transport: Box<dyn Transport>,
     id: String,
+    /// Credential for this source. Injected rather than read from the environment on
+    /// every call: an env var is process-global state, which makes tests race against
+    /// each other and makes the source impossible to exercise both ways in one run.
+    token: Option<String>,
     /// How many listing pages to walk. Two covers the active set comfortably.
     pub pages: u32,
 }
 
 impl KaggleSource {
+    /// Build a source using whatever credential the environment provides.
     pub fn new(transport: Box<dyn Transport>) -> Self {
+        Self::with_token(transport, auth_token())
+    }
+
+    /// Build a source with an explicit credential, or none.
+    pub fn with_token(transport: Box<dyn Transport>, token: Option<String>) -> Self {
         Self {
             transport,
             id: "kaggle".into(),
+            token,
             pages: 2,
         }
     }
 
     pub fn request_cost(&self) -> u32 {
-        if auth_token().is_some() {
+        if self.token.is_some() {
             self.pages
         } else {
             0
@@ -70,7 +81,7 @@ impl KaggleSource {
     }
 
     fn fetch(&self) -> Result<Vec<Competition>> {
-        let Some(token) = auth_token() else {
+        let Some(token) = self.token.as_deref() else {
             return Ok(Vec::new());
         };
         let bearer = format!("Bearer {token}");
@@ -281,19 +292,16 @@ mod tests {
        "deadline":"2026-01-01T00:00:00Z","enabledDate":"2025-01-01T00:00:00Z","category":"Featured","submissionsDisabled":true}
     ]"#;
 
-    fn with_token<T>(f: impl FnOnce() -> T) -> T {
-        std::env::set_var("KAGGLE_KEY", "test-token");
-        let out = f();
-        std::env::remove_var("KAGGLE_KEY");
-        out
+    fn source(pages: u32) -> KaggleSource {
+        source_with(pages, Some("test-token".to_string()))
     }
 
-    fn source(pages: u32) -> KaggleSource {
+    fn source_with(pages: u32, token: Option<String>) -> KaggleSource {
         let mut t = FixtureTransport::new();
         for p in 1..=pages {
             t = t.with(KaggleSource::page_url(p), 200, if p == 1 { PAGE } else { "[]" });
         }
-        let mut s = KaggleSource::new(Box::new(t));
+        let mut s = KaggleSource::with_token(Box::new(t), token);
         s.pages = pages;
         s
     }
@@ -338,42 +346,34 @@ mod tests {
 
     #[test]
     fn deadlines_are_carried_onto_the_niche() {
-        with_token(|| {
-            let niches = source(2).niches().unwrap();
-            let arc = niches.iter().find(|n| n.id == "kaggle:arc-prize-2026").unwrap();
-            let closes = arc.closes_ms.expect("a competition has a published deadline");
-            assert_eq!(closes, parse_rfc3339_utc("2026-11-02T23:59:00Z").unwrap());
-            assert!(arc.opened_ms.is_some());
-        });
+        let niches = source(2).niches().unwrap();
+        let arc = niches.iter().find(|n| n.id == "kaggle:arc-prize-2026").unwrap();
+        let closes = arc.closes_ms.expect("a competition has a published deadline");
+        assert_eq!(closes, parse_rfc3339_utc("2026-11-02T23:59:00Z").unwrap());
+        assert!(arc.opened_ms.is_some());
     }
 
     #[test]
     fn closed_competitions_are_excluded() {
-        with_token(|| {
-            let niches = source(2).niches().unwrap();
-            assert!(!niches.iter().any(|n| n.id == "kaggle:closed-one"));
-            assert_eq!(niches.len(), 2);
-        });
+        let niches = source(2).niches().unwrap();
+        assert!(!niches.iter().any(|n| n.id == "kaggle:closed-one"));
+        assert_eq!(niches.len(), 2);
     }
 
     #[test]
     fn observations_carry_team_count_and_reward_per_team() {
-        with_token(|| {
-            let obs = source(2).observe(0).unwrap();
-            let arc = obs.iter().find(|o| o.niche_id == "kaggle:arc-prize-2026").unwrap();
-            assert_eq!(arc.competitors, Some(2382.0));
-            assert!(arc.reward_cents.unwrap() > 35_000);
-            let titanic = obs.iter().find(|o| o.niche_id == "kaggle:titanic").unwrap();
-            assert_eq!(titanic.reward_cents, None, "no cash prize, no reward reading");
-            assert_eq!(titanic.competitors, Some(10377.0));
-        });
+        let obs = source(2).observe(0).unwrap();
+        let arc = obs.iter().find(|o| o.niche_id == "kaggle:arc-prize-2026").unwrap();
+        assert_eq!(arc.competitors, Some(2382.0));
+        assert!(arc.reward_cents.unwrap() > 35_000);
+        let titanic = obs.iter().find(|o| o.niche_id == "kaggle:titanic").unwrap();
+        assert_eq!(titanic.reward_cents, None, "no cash prize, no reward reading");
+        assert_eq!(titanic.competitors, Some(10377.0));
     }
 
     #[test]
     fn without_a_token_the_source_is_silent_rather_than_broken() {
-        std::env::remove_var("KAGGLE_KEY");
-        std::env::remove_var("KAGGLE_API_TOKEN");
-        let s = source(2);
+        let s = source_with(2, None);
         assert_eq!(s.request_cost(), 0);
         assert!(s.niches().unwrap().is_empty());
         assert!(s.observe(0).unwrap().is_empty());
@@ -381,12 +381,10 @@ mod tests {
 
     #[test]
     fn a_rejected_token_is_reported_clearly() {
-        with_token(|| {
-            let t = FixtureTransport::new().with(KaggleSource::page_url(1), 401, "Unauthenticated");
-            let mut s = KaggleSource::new(Box::new(t));
-            s.pages = 1;
-            let err = s.observe(0).unwrap_err().to_string();
-            assert!(err.contains("rejected the token"), "got: {err}");
-        });
+        let t = FixtureTransport::new().with(KaggleSource::page_url(1), 401, "Unauthenticated");
+        let mut s = KaggleSource::with_token(Box::new(t), Some("t".into()));
+        s.pages = 1;
+        let err = s.observe(0).unwrap_err().to_string();
+        assert!(err.contains("rejected the token"), "got: {err}");
     }
 }

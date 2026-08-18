@@ -4,6 +4,7 @@
 //! they are all free to poll — a source that costs money to watch cannot be watched at
 //! all under this system's constraints.
 
+pub mod defillama;
 pub mod github;
 pub mod github_search;
 pub mod huggingface;
@@ -12,6 +13,7 @@ pub mod http;
 pub mod sim;
 pub mod timefmt;
 
+pub use defillama::{DefiLlamaSource, Pool, PoolFilter};
 pub use github::{GithubNiche, GithubSource};
 pub use github_search::{GithubSearchNiche, GithubSearchSource};
 pub use huggingface::{HfKind, HfNiche, HuggingFaceSource};

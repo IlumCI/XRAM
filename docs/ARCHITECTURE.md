@@ -82,7 +82,9 @@ the cost of being wrong is asymmetric.
 Each source is a candidate income stream, and all of them are free to poll.
 
 - **`http`** — a `Transport` trait so every source is testable against recorded payloads
-  with no network. The `ureq` implementation loads trust anchors from `SSL_CERT_FILE`,
+  with no network. Bodies are read through the reader rather than `into_string`, whose
+  undocumented 10 MB ceiling silently killed the yield source: the pool listing is a
+  single ~11 MB document. An explicit 64 MB cap replaces it. The `ureq` implementation loads trust anchors from `SSL_CERT_FILE`,
   `REQUESTS_CA_BUNDLE`, `CURL_CA_BUNDLE` and the system store, and honours `HTTPS_PROXY`
   — egress commonly runs through a TLS-inspecting proxy whose CA is installed in the
   environment rather than baked into any crate.
@@ -120,6 +122,16 @@ Each source is a candidate income stream, and all of them are free to poll.
   unscored rather than recorded as zero, since they are a different kind of thing rather
   than a cheap one. Absent a token the source reports nothing and the rest of the sweep
   proceeds.
+- **`defillama`** — yield pools, and the closest thing to a natural fit this project has
+  found. A yield is a rate that decays as capital floods in, which is exactly what the
+  crowding meter measures, so the mapping needed no new machinery: **APY** becomes the
+  reward metric (falling = margin competed away) and **TVL** becomes competitor density
+  (rising = capital crowding in). Both directions were already handled correctly.
+  Measures `apyBase` rather than headline `apy`, because the headline folds in
+  reward-token emissions that stop without warning. Filters out thin pools posting
+  spectacular unreachable rates, pools carrying impermanent-loss risk (a second,
+  uncorrelated way to lose the position that a rate trend says nothing about), and
+  DefiLlama's own flagged outliers. One unauthenticated request covers every pool.
 - **`timefmt`** — RFC 3339 parsing without a datetime dependency. Accepts only the UTC
   `Z` form; an offset form is refused rather than silently mis-parsed, since every
   latency we measure depends on it.
