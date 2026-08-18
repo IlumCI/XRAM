@@ -8,9 +8,15 @@ is becoming and rotates out before the margin collapses. Everyone optimises thei
 almost nobody measures its half-life, so they all exit late.
 
 ```sh
-cargo test                      # 75 tests, no network
+cargo test                      # 101 tests, no network
 cargo run --bin hl -- demo      # full loop against niches with known half-lives
+cargo run --bin hl -- sweep     # poll every source, store, refresh REPORT.md
 ```
+
+A scheduled workflow runs the sweep hourly on free public-repo runners and snapshots
+state to the `data` branch, because the estimator refuses to speak until it has roughly
+six samples over half a day — and nothing invoked by hand ever gets there. Live
+portfolio state: [REPORT.md on the `data` branch](../../blob/data/REPORT.md).
 
 ```
 NICHE                        SIGNAL    RUNWAY HALF-LIFE 95% CI    WEEKLY
@@ -27,6 +33,11 @@ against whatever opportunity set exists; it cannot manufacture opportunity.
 - [docs/KILL-LIST.md](docs/KILL-LIST.md) — six strategies considered, and the 2026 fact
   that killed each
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — how the code works
+
+Sources are all free and unauthenticated where possible. Hugging Face tag saturation is
+the cheapest honest crowding measurement available: one request returns the 100 newest
+artefacts for a tag, and the span they cover *is* the creation rate — `text-generation`
+runs at ~4,400 new models/day, `robotics` at ~90.
 
 Zero capital, free tiers only. The quota governor reserves before every metered call and
 persists counters across restarts, so the system is structurally incapable of running up

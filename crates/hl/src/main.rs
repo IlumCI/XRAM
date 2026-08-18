@@ -4,18 +4,24 @@
 //! known, so the estimator can be checked against ground truth without touching a
 //! network or spending a request.
 
+mod config;
 mod render;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
-use hl_core::{now_millis, Governor, Ledger, LedgerEvent, QuotaLimits, Signal, Source};
+use config::Config;
+use hl_core::{
+    now_millis, Governor, Ledger, LedgerEvent, Observation, ObservationStore, QuotaLimits,
+    Signal, Source, MS_PER_DAY,
+};
 use hl_probe::{crowding::CrowdingMeter, policy, PolicyConfig};
 use hl_scout::{Scout, SightingIndex};
 use hl_venues::{
-    github::GithubNiche, http::UreqTransport, GithubSource, SimNiche, SimSource,
+    github::GithubNiche, github_search::GithubSearchNiche, http::UreqTransport, huggingface::HfNiche,
+    GithubSearchSource, GithubSource, HuggingFaceSource, SimNiche, SimSource,
 };
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Parser)]
 #[command(
@@ -49,6 +55,22 @@ enum Cmd {
         #[arg(long)]
         live: bool,
     },
+    /// Poll every configured source once, store what comes back, refresh the report.
+    /// This is what the scheduled job runs.
+    Sweep {
+        /// Exercise the whole path without network calls or writes.
+        #[arg(long)]
+        dry_run: bool,
+        #[arg(long, default_value = "halflife.toml")]
+        config: PathBuf,
+    },
+    /// Render the ranked portfolio from stored observations.
+    Report {
+        #[arg(long, default_value = "REPORT.md")]
+        out: PathBuf,
+        #[arg(long, default_value = "halflife.toml")]
+        config: PathBuf,
+    },
     /// Show realised yield per niche and verify the ledger chain.
     Ledger,
     /// Show free-tier quota consumed today.
@@ -57,23 +79,106 @@ enum Cmd {
 
 fn default_limits() -> HashMap<String, QuotaLimits> {
     let mut m = HashMap::new();
-    // GitHub unauthenticated: 60 requests/hour. Held well under, because being rate
-    // limited mid-sweep corrupts a series rather than merely delaying it.
+    // GitHub core API: 60 requests/hour unauthenticated, 1,000/hour for the Actions
+    // token. Held well under, because being rate limited mid-sweep corrupts a series
+    // rather than merely delaying it.
     m.insert("github".into(), QuotaLimits::new(5, 1_200, u64::MAX));
+    // Search is a separate, much tighter bucket: 30/minute authenticated.
+    m.insert("github-search".into(), QuotaLimits::new(10, 600, u64::MAX));
+    // Hugging Face publishes no hard limit for anonymous reads; this is politeness,
+    // not a documented ceiling. The per-minute figure has to clear one whole sweep in a
+    // burst, or a sweep with more tags than the limit can never complete — the governor
+    // is all-or-nothing per source by design, since half a sweep fits a trend to half a
+    // picture.
+    m.insert("huggingface".into(), QuotaLimits::new(30, 2_000, u64::MAX));
     m
 }
 
-fn main() -> Result<()> {
-    let cli = Cli::parse();
-    std::fs::create_dir_all(&cli.state)?;
-    let ledger = Ledger::open(cli.state.join("ledger.jsonl"))?;
-    let governor = Governor::new(default_limits()).persisted(cli.state.join("quota.json"));
+/// Build the live sources described by the config.
+fn build_sources(cfg: &Config) -> (HuggingFaceSource, GithubSearchSource, Option<GithubSource>) {
+    let mut hf: Vec<HfNiche> = cfg.hf_model_tags.iter().map(|t| HfNiche::models(t)).collect();
+    hf.extend(cfg.hf_dataset_tags.iter().map(|t| HfNiche::datasets(t)));
 
-    match cli.cmd {
+    let searches: Vec<GithubSearchNiche> = cfg
+        .github_searches
+        .iter()
+        .map(|pair| GithubSearchNiche::new(&pair[0], &pair[1]))
+        .collect();
+
+    let repos: Vec<GithubNiche> = cfg
+        .github_repos
+        .iter()
+        .filter_map(|spec| {
+            let (repo, label) = spec.rsplit_once(':')?;
+            let (owner, name) = repo.split_once('/')?;
+            Some(GithubNiche::new(owner, name, label))
+        })
+        .collect();
+
+    (
+        HuggingFaceSource::new(hf, Box::new(UreqTransport::default())),
+        GithubSearchSource::new(searches, Box::new(UreqTransport::default())),
+        (!repos.is_empty())
+            .then(|| GithubSource::new(repos, Box::new(UreqTransport::default()))),
+    )
+}
+
+/// Poll one source under quota, returning what it produced.
+///
+/// A source that fails is reported and skipped: one rate-limited API must not cost us
+/// the sweep, and a gap in one series is survivable where a missed sweep is not.
+fn poll(
+    governor: &Governor,
+    provider: &str,
+    cost: u32,
+    since_ms: u64,
+    src: &dyn Source,
+) -> (Vec<Observation>, Vec<String>) {
+    let mut errors = Vec::new();
+    let mut permits = Vec::new();
+    for _ in 0..cost {
+        match governor.acquire(provider, 0) {
+            Ok(p) => permits.push(p),
+            Err(e) => {
+                errors.push(format!("{provider}: {e}"));
+                break;
+            }
+        }
+    }
+    if permits.len() < cost as usize {
+        // Partial quota means a partial picture; better to skip than to fit a trend to
+        // half a sweep.
+        for p in permits {
+            governor.settle(p, 0);
+        }
+        return (Vec::new(), errors);
+    }
+    let out = match src.observe(since_ms) {
+        Ok(o) => o,
+        Err(e) => {
+            errors.push(format!("{}: {e}", src.id()));
+            Vec::new()
+        }
+    };
+    for p in permits {
+        governor.settle(p, 0);
+    }
+    (out, errors)
+}
+
+fn main() -> Result<()> {
+    let Cli { state, cmd } = Cli::parse();
+    std::fs::create_dir_all(&state)?;
+    let ledger = Ledger::open(state.join("ledger.jsonl"))?;
+    let governor = Governor::new(default_limits()).persisted(state.join("quota.json"));
+
+    match cmd {
         Cmd::Demo { days } => demo(&ledger, days),
         Cmd::Watch { repos, label, live } => {
-            watch(&ledger, &governor, &cli.state, &repos, &label, live)
+            watch(&ledger, &governor, &state, &repos, &label, live)
         }
+        Cmd::Sweep { dry_run, config } => sweep(&state, &ledger, &governor, &config, dry_run),
+        Cmd::Report { out, config } => report(&state, &out, &config),
         Cmd::Ledger => show_ledger(&ledger),
         Cmd::Quota => {
             for provider in default_limits().keys() {
@@ -131,21 +236,21 @@ fn demo(ledger: &Ledger, days: f64) -> Result<()> {
             crowding_index: report.weekly_decay,
             half_life_days: report.half_life_days(),
         })?;
-        rows.push((format!("{} ({})", n.id, n.notes), decision, report));
+        rows.push(render::Row {
+            observations: obs.iter().filter(|o| o.niche_id == n.id).count(),
+            label: format!("{} ({})", n.id, n.notes),
+            decision,
+            report,
+        });
     }
 
     print!("{}", render::decision_table(&rows));
 
-    let acted: Vec<&String> = rows
+    let acted = rows
         .iter()
-        .filter(|(_, d, _)| matches!(d.signal, Signal::Enter | Signal::Hold))
-        .map(|(l, _, _)| l)
-        .collect();
-    println!(
-        "\n{} of {} niches worth effort right now.",
-        acted.len(),
-        rows.len()
-    );
+        .filter(|r| matches!(r.decision.signal, Signal::Enter | Signal::Hold))
+        .count();
+    println!("\n{acted} of {} niches worth effort right now.", rows.len());
     println!("ledger: {}", ledger.path().display());
     Ok(())
 }
@@ -220,7 +325,12 @@ fn watch(
             crowding_index: report.weekly_decay,
             half_life_days: report.half_life_days(),
         })?;
-        rows.push((n.label.clone(), decision, report));
+        rows.push(render::Row {
+            observations: obs.iter().filter(|o| o.niche_id == n.id).count(),
+            label: n.label.clone(),
+            decision,
+            report,
+        });
     }
     print!("{}", render::decision_table(&rows));
     Ok(())
@@ -257,5 +367,149 @@ fn show_ledger(ledger: &Ledger) -> Result<()> {
     }
     println!("{}", "-".repeat(78));
     println!("{:<32} {:>31}c", "TOTAL NET", net_total);
+    Ok(())
+}
+
+/// One pass over every configured source.
+///
+/// Designed to be run by a scheduler on a machine that keeps nothing: all state lives
+/// in the store, the ledger and the quota file, and every one of those survives the
+/// process exiting.
+fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_run: bool) -> Result<()> {
+    let cfg = Config::load(config)?;
+    let store_path = state.join("observations.jsonl");
+
+    if dry_run {
+        println!("dry run: {} request(s) would be made\n", cfg.request_cost());
+        let (hf, gh, repos) = build_sources(&cfg);
+        for n in hf.niches()?.iter().chain(gh.niches()?.iter()) {
+            println!("  {}", n.id);
+        }
+        if let Some(r) = &repos {
+            for n in r.niches()? {
+                println!("  {}", n.id);
+            }
+        }
+        println!("\nstore: {}", store_path.display());
+        return Ok(());
+    }
+
+    let mut store = ObservationStore::open(&store_path)?;
+    let mut idx = SightingIndex::load(state.join("sightings.json"))?;
+    let resume = store.resume_points()?;
+    let now = now_millis();
+    let before = store.len();
+    let mut errors: Vec<String> = Vec::new();
+
+    let (hf, gh_search, gh_repos) = build_sources(&cfg);
+
+    let mut all: Vec<Observation> = Vec::new();
+    let mut record = |src: &dyn Source, provider: &str, cost: u32| -> Result<()> {
+        // Register every niche before polling, so a source that fails still contributes
+        // its discovery — knowing a window exists is worth something even when we
+        // cannot measure it yet.
+        if let Ok(niches) = src.niches() {
+            for n in niches {
+                if let Some(s) = idx.record(&n, src.id(), now) {
+                    ledger.append(LedgerEvent::NicheDiscovered {
+                        niche_id: s.niche_id.clone(),
+                        class: format!("{:?}", n.class).to_lowercase(),
+                        detection_latency_ms: s.detection_latency_ms(),
+                        source: s.source,
+                    })?;
+                }
+            }
+        }
+        let since = resume.get(provider).copied().unwrap_or(0);
+        let (obs, errs) = poll(governor, provider, cost, since, src);
+        all.extend(obs);
+        errors.extend(errs);
+        Ok(())
+    };
+
+    record(&hf, "huggingface", hf.request_cost())?;
+    record(&gh_search, "github-search", gh_search.request_cost())?;
+    if let Some(r) = &gh_repos {
+        record(r, "github", r.request_cost())?;
+    }
+
+    let added = store.append(&all)?;
+    let pruned = store.prune(now.saturating_sub((cfg.retain_days * MS_PER_DAY) as u64))?;
+    idx.save()?;
+
+    println!(
+        "sweep: {} collected, {added} new, {pruned} pruned, {} total",
+        all.len(),
+        store.len()
+    );
+    if before == 0 && added > 0 {
+        println!("first observations stored; the estimator needs a day or so of these.");
+    }
+    for e in &errors {
+        println!("  ! {e}");
+    }
+
+    report(state, Path::new("REPORT.md"), config)
+}
+
+/// Render every niche the store knows about, ranked.
+fn report(state: &Path, out: &Path, config: &Path) -> Result<()> {
+    let cfg = Config::load(config)?;
+    let store = ObservationStore::open(state.join("observations.jsonl"))?;
+    let obs = store.read_all()?;
+    let now = now_millis();
+    let meter = CrowdingMeter::default();
+    let policy_cfg = PolicyConfig::default();
+
+    let mut rows: Vec<render::Row> = Vec::new();
+    for id in store.niche_ids()? {
+        let r = meter.report(&id, &obs, now);
+        let d = policy::decide(&r, &hl_core::EntryCost::default(), &policy_cfg);
+        rows.push(render::Row {
+            observations: obs.iter().filter(|o| o.niche_id == id).count(),
+            label: id,
+            decision: d,
+            report: r,
+        });
+    }
+    // Undetermined niches sort last: they are pending, not promising.
+    rows.sort_by(|a, b| {
+        let key = |r: &render::Row| match r.decision.signal {
+            Signal::Insufficient => (1, 0.0),
+            _ => (0, -r.decision.runway_days.unwrap_or(f64::INFINITY)),
+        };
+        key(a).partial_cmp(&key(b)).unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    let table = render::decision_table(&rows);
+    print!("{table}");
+
+    let span_days = match (obs.iter().map(|o| o.ts_ms).min(), obs.iter().map(|o| o.ts_ms).max()) {
+        (Some(lo), Some(hi)) => (hi - lo) as f64 / MS_PER_DAY,
+        _ => 0.0,
+    };
+    let actionable = rows
+        .iter()
+        .filter(|r| !matches!(r.decision.signal, Signal::Insufficient))
+        .count();
+
+    let md = format!(
+        "# Halflife portfolio\n\n\
+         {} observations across {} niches, spanning {:.1} days. \
+         {actionable} of {} niches have enough evidence to act on.\n\n\
+         `Insufficient` means not enough data yet, which is not the same as a bad niche. \
+         Runway is measured against the fast end of the confidence interval.\n\n\
+         ```\n{}```\n\n\
+         Watching {} tag(s) and {} search(es). Regenerated by the scheduled sweep.\n",
+        obs.len(),
+        rows.len(),
+        span_days,
+        rows.len(),
+        table,
+        cfg.hf_model_tags.len() + cfg.hf_dataset_tags.len(),
+        cfg.github_searches.len(),
+    );
+    std::fs::write(out, md).with_context(|| format!("writing {}", out.display()))?;
+    println!("\nwrote {}", out.display());
     Ok(())
 }

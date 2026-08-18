@@ -1,0 +1,81 @@
+# Hourly crowding sweep.
+#
+# Public repositories get GitHub-hosted runners free with no minute cap, which is the
+# only reason this project can accumulate a time series at all: the estimator refuses to
+# speak until it has ~6 samples over half a day, and nothing invoked by hand ever gets
+# there.
+#
+# State lives on a separate `data` branch, force-pushed as a snapshot each run. That
+# keeps hourly machine commits out of `main`'s history and stops the git history itself
+# from growing without bound — the real history is inside observations.jsonl, which is
+# pruned by retention.
+name: sweep
+
+on:
+  schedule:
+    # Not on the hour: scheduled jobs at :00 queue behind everyone else's.
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Never let two sweeps race for the data branch; skip rather than queue, since a missed
+# hour costs one sample and a corrupted snapshot costs the series.
+concurrency:
+  group: halflife-sweep
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore state from the data branch
+        run: |
+          mkdir -p state
+          if git fetch --depth=1 origin data 2>/dev/null; then
+            git archive FETCH_HEAD | tar -x -C state
+            echo "restored $(ls -1 state | wc -l) state file(s)"
+          else
+            echo "no data branch yet; starting from empty"
+          fi
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ hashFiles('Cargo.lock') }}
+          restore-keys: cargo-
+
+      - name: Build
+        run: cargo build --release --bin hl
+
+      - name: Sweep
+        env:
+          # Raises search from 10 requests/minute on a shared runner IP to 1,000/hour.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./target/release/hl --state state sweep
+
+      - name: Publish state
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp REPORT.md state/REPORT.md 2>/dev/null || true
+          cd state
+          rm -rf .git
+          git init -q -b data
+          git config user.name "IlumCI"
+          git config user.email "ilumbackup@gmail.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "nothing changed this sweep"
+            exit 0
+          fi
+          git commit -q -m "sweep $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push -f \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" data

@@ -5,10 +5,14 @@
 //! all under this system's constraints.
 
 pub mod github;
+pub mod github_search;
+pub mod huggingface;
 pub mod http;
 pub mod sim;
 pub mod timefmt;
 
 pub use github::{GithubNiche, GithubSource};
+pub use github_search::{GithubSearchNiche, GithubSearchSource};
+pub use huggingface::{HfKind, HfNiche, HuggingFaceSource};
 pub use http::{FixtureTransport, HttpResponse, Transport, UreqTransport};
 pub use sim::{SimNiche, SimSource};

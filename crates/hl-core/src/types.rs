@@ -74,8 +74,11 @@ pub struct Observation {
     /// Time between an opportunity appearing and someone claiming it. The primary
     /// crowding signal: when this collapses, machines have arrived.
     pub claim_latency_ms: Option<u64>,
-    /// Visible competitors on a single opportunity.
-    pub competitors: Option<u32>,
+    /// Competitor density. Either a count on a single opportunity (comments on an
+    /// issue) or a rate (new entrants per day in a category) — both answer "how many
+    /// others are chasing this", and the meter only ever fits the trend, never the
+    /// absolute level, so the two are interchangeable within a niche.
+    pub competitors: Option<f64>,
     /// Advertised or realised reward, in cents.
     pub reward_cents: Option<u64>,
     /// Realised acceptance rate, when the venue tells us.
@@ -99,7 +102,7 @@ impl Observation {
         self.claim_latency_ms = Some(ms);
         self
     }
-    pub fn competitors(mut self, n: u32) -> Self {
+    pub fn competitors(mut self, n: f64) -> Self {
         self.competitors = Some(n);
         self
     }

@@ -234,7 +234,7 @@ fn extract(metric: Metric, o: &Observation) -> Option<Point> {
         Metric::ClaimLatency => o.claim_latency_ms? as f64,
         Metric::Reward => o.reward_cents? as f64,
         Metric::Acceptance => o.acceptance?,
-        Metric::Competitors => o.competitors? as f64,
+        Metric::Competitors => o.competitors?,
     };
     (v > 0.0).then(|| Point::new(o.ts_ms, v))
 }
@@ -297,7 +297,7 @@ mod tests {
             .map(|i| {
                 let t = i as f64 / 4.0;
                 Observation::new("n", days_ms(t), "sim")
-                    .competitors((2.0 * 2.0_f64.powf(t / 5.0)) as u32 + 1)
+                    .competitors(2.0 * 2.0_f64.powf(t / 5.0) + 1.0)
             })
             .collect();
         let r = CrowdingMeter::default().report("n", &obs, days_ms(10.0));

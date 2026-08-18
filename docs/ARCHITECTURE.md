@@ -25,6 +25,13 @@ Domain model plus the two disciplines that must not be optional.
 - **`ledger`** — append-only JSONL, each record hashed over its predecessor. Editing any
   past record breaks the chain and `verify_chain` says so. `yield_by_niche` is the table
   that decides what to keep and what to abandon; losses show as negative numbers.
+- **`store`** — append-only observation store with stable dedupe keys. Polls overlap by
+  design (inclusive resume boundaries, so nothing is missed), which means the same
+  observation arrives repeatedly; stacking duplicates at one timestamp would weight that
+  moment more heavily than the rest of the series and bias every fit after it. A changed
+  value at the same instant *is* kept — that is new signal, not a duplicate. One corrupt
+  line from a killed job is skipped rather than discarding the series, and retention
+  pruning bounds growth for something that appends hourly forever.
 - **`prng`** — SplitMix64, seeded from a key. Deliberately not `rand`: every random
   choice must be replayable from the ledger.
 
@@ -90,6 +97,18 @@ Each source is a candidate income stream, and all of them are free to poll.
   `describe_failure` separates "rate limited" from "token scoped elsewhere" — both
   arrive as HTTP 403, and confusing them sends you tuning poll intervals when the real
   problem is credentials.
+- **`huggingface`** — tag saturation, and the strongest signal in the array. One
+  unauthenticated request returns the 100 newest artefacts for a tag; the span they
+  cover is the creation rate, so competitor density comes from a single call with no
+  token. Stamped at the newest artefact rather than at poll time, which makes repeated
+  polls of a quiet tag deduplicate naturally — nothing new created means nothing new to
+  record. Deliberately reports no reward metric: downloads accumulate with age and
+  cohort age shrinks as the rate rises, so any reward read from the same request would
+  move with the rate and double-count it.
+- **`github_search`** — cross-repository discovery, which is what turns the scout from
+  "watch these repos" into "find windows anywhere". Reuses `parse_issues` on the search
+  envelope's items. Search is a much tighter rate bucket than the core API (30/min
+  authenticated, 10 unauthenticated), so it gets its own provider in the governor.
 - **`timefmt`** — RFC 3339 parsing without a datetime dependency. Accepts only the UTC
   `Z` form; an offset form is refused rather than silently mis-parsed, since every
   latency we measure depends on it.
@@ -110,9 +129,26 @@ require running code we did not write. A private working copy, a scrubbed enviro
 `Sandbox` trait exists so a microVM backend can replace the local one without touching
 callers.
 
+## Scheduled operation
+
+`.github/workflows/sweep.yml` runs `hl sweep` hourly on GitHub-hosted runners, free and
+uncapped because the repository is public. State is snapshotted to a separate `data`
+branch by force-push, keeping machine commits out of `main` and stopping git history
+from growing without bound — the real history lives inside `observations.jsonl`, bounded
+by retention pruning.
+
+The Actions token also matters for correctness, not just politeness: unauthenticated
+search allows 10 requests/minute against a shared runner IP, which in practice means
+403s, while the CI token raises it to 1,000/hour.
+
+Note that the governor is all-or-nothing per source: a sweep that cannot reserve quota
+for every one of its requests skips the source entirely, because half a sweep fits a
+trend to half a picture. Per-minute limits therefore have to clear one whole sweep in a
+burst.
+
 ## Testing
 
-75 tests, none requiring network. The estimator is checked against ground truth from
+101 tests, none requiring network. The estimator is checked against ground truth from
 `hl-venues::sim`; the governor is asserted to hold under synthetic flood and across
 simulated restarts; the ledger is asserted to detect tampering. One `#[ignore]`d test
 hits the live GitHub API for manual verification.

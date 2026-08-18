@@ -115,9 +115,11 @@ impl Source for GithubSource {
     fn observe(&self, since_ms: u64) -> Result<Vec<Observation>> {
         let mut out = Vec::new();
         for n in &self.niches {
-            let resp = self
-                .transport
-                .get(&n.url(), &[("Accept", "application/vnd.github+json")])?;
+            let token = auth_token();
+            let headers = github_headers(token.as_deref());
+            let borrowed: Vec<(&str, &str)> =
+                headers.iter().map(|(k, v)| (k.as_str(), v.as_str())).collect();
+            let resp = self.transport.get(&n.url(), &borrowed)?;
             // 403 is overloaded: it means "slow down" and "you may not read this", and
             // conflating them sends you tuning rate limits when the real problem is a
             // token scoped to other repositories. The body says which.
@@ -128,6 +130,36 @@ impl Source for GithubSource {
         }
         Ok(out)
     }
+}
+
+/// GitHub credentials from the environment, if any.
+///
+/// Unauthenticated search allows 10 requests a minute against a shared runner IP, which
+/// in practice means 403s; the token a CI job is handed raises that to 1,000 an hour.
+/// Absent or placeholder values yield `None` so we send no header at all rather than a
+/// broken one.
+pub fn auth_token() -> Option<String> {
+    for key in ["GITHUB_TOKEN", "GH_TOKEN"] {
+        if let Ok(v) = std::env::var(key) {
+            let v = v.trim().to_string();
+            if !v.is_empty() && v != "proxy-injected" {
+                return Some(v);
+            }
+        }
+    }
+    None
+}
+
+/// Request headers for the GitHub API, with auth when available.
+pub fn github_headers(token: Option<&str>) -> Vec<(String, String)> {
+    let mut h = vec![
+        ("Accept".to_string(), "application/vnd.github+json".to_string()),
+        ("X-GitHub-Api-Version".to_string(), "2022-11-28".to_string()),
+    ];
+    if let Some(t) = token {
+        h.push(("Authorization".to_string(), format!("Bearer {t}")));
+    }
+    h
 }
 
 /// Explain a non-200 in terms of what to do about it.
@@ -177,7 +209,7 @@ pub fn parse_issues(
         let mut o = Observation::new(niche_id, closed, source)
             .claim_latency((closed - created).max(1));
         if i.comments > 0 {
-            o = o.competitors(i.comments);
+            o = o.competitors(i.comments as f64);
         }
         let text = format!(
             "{} {}",
@@ -263,7 +295,7 @@ mod tests {
         assert_eq!(obs.len(), 2, "pull requests and open issues must be excluded");
         assert_eq!(obs[0].claim_latency_ms, Some(2 * 3_600_000));
         assert_eq!(obs[0].reward_cents, Some(50_000));
-        assert_eq!(obs[0].competitors, Some(3));
+        assert_eq!(obs[0].competitors, Some(3.0));
         assert_eq!(obs[1].reward_cents, None);
     }
 
@@ -278,6 +310,26 @@ mod tests {
         let cut = parse_rfc3339_utc("2026-08-02T00:00:00Z").unwrap();
         let obs = parse_issues(PAYLOAD, "n", "github", cut).unwrap();
         assert_eq!(obs.len(), 1);
+    }
+
+    #[test]
+    fn placeholder_tokens_are_not_sent_as_credentials() {
+        std::env::set_var("GITHUB_TOKEN", "proxy-injected");
+        assert_eq!(auth_token(), None, "a placeholder must not become a header");
+        std::env::set_var("GITHUB_TOKEN", "  ");
+        assert_eq!(auth_token(), None);
+        std::env::set_var("GITHUB_TOKEN", "ghs_real");
+        assert_eq!(auth_token().as_deref(), Some("ghs_real"));
+        std::env::remove_var("GITHUB_TOKEN");
+    }
+
+    #[test]
+    fn headers_carry_auth_only_when_there_is_a_token() {
+        let none = github_headers(None);
+        assert!(!none.iter().any(|(k, _)| k == "Authorization"));
+        let some = github_headers(Some("t"));
+        assert!(some.iter().any(|(k, v)| k == "Authorization" && v == "Bearer t"));
+        assert!(some.iter().any(|(k, _)| k == "X-GitHub-Api-Version"));
     }
 
     #[test]

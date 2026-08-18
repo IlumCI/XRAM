@@ -15,11 +15,13 @@
 pub mod governor;
 pub mod ledger;
 pub mod prng;
+pub mod store;
 pub mod types;
 
 pub use governor::{Governor, Permit, QuotaDenied, QuotaLimits};
 pub use ledger::{Ledger, LedgerEvent, LedgerRecord, NicheYield};
 pub use prng::Rng;
+pub use store::{observation_key, ObservationStore};
 pub use types::*;
 
 use std::time::{SystemTime, UNIX_EPOCH};

@@ -7,6 +7,17 @@
 use hl_core::Signal;
 use hl_probe::{CrowdingReport, Decision, Metric};
 
+/// One niche as it appears in the report.
+pub struct Row {
+    pub label: String,
+    /// Raw observations stored for this niche. Distinct from the fitted sample count:
+    /// a niche can hold observations and still fit nothing, and the gap between the two
+    /// is exactly "how much longer until this says something".
+    pub observations: usize,
+    pub decision: Decision,
+    pub report: CrowdingReport,
+}
+
 pub fn signal_tag(s: Signal) -> &'static str {
     match s {
         Signal::Enter => "ENTER",
@@ -27,15 +38,21 @@ pub fn fmt_days(d: Option<f64>) -> String {
 }
 
 /// One line per niche: the table you actually rotate on.
-pub fn decision_table(rows: &[(String, Decision, CrowdingReport)]) -> String {
+pub fn decision_table(rows: &[Row]) -> String {
     let mut out = String::new();
     out.push_str(&format!(
-        "{:<28} {:<6} {:>9} {:>16} {:>9}  {}\n",
-        "NICHE", "SIGNAL", "RUNWAY", "HALF-LIFE 95% CI", "WEEKLY", "BASIS"
+        "{:<28} {:<6} {:>5} {:>9} {:>16} {:>8}  {}\n",
+        "NICHE", "SIGNAL", "OBS", "RUNWAY", "HALF-LIFE 95% CI", "WEEKLY", "BASIS"
     ));
-    out.push_str(&"-".repeat(110));
+    out.push_str(&"-".repeat(112));
     out.push('\n');
-    for (label, d, r) in rows {
+    for Row {
+        label,
+        observations,
+        decision: d,
+        report: r,
+    } in rows
+    {
         let ci = r
             .metrics
             .iter()
@@ -46,13 +63,14 @@ pub fn decision_table(rows: &[(String, Decision, CrowdingReport)]) -> String {
             .unwrap_or_else(|| "-".into());
         let basis: Vec<&str> = r.metrics.iter().map(|m| m.metric.label()).collect();
         out.push_str(&format!(
-            "{:<28} {:<6} {:>9} {:>16} {:>8.0}%  {}\n",
+            "{:<28} {:<6} {:>5} {:>9} {:>16} {:>7.0}%  {}\n",
             truncate(label, 28),
             signal_tag(d.signal),
+            observations,
             fmt_days(d.runway_days),
             ci,
             r.weekly_decay * 100.0,
-            if basis.is_empty() { "no data".into() } else { basis.join(",") }
+            if basis.is_empty() { "none yet".into() } else { basis.join(",") }
         ));
         out.push_str(&format!("{:<28} {}\n", "", d.reason));
     }
@@ -76,6 +94,28 @@ mod tests {
         assert_eq!(fmt_days(None), "unknown");
         assert_eq!(fmt_days(Some(3.25)), "3.2d");
         assert_eq!(fmt_days(Some(5000.0)), ">1000d");
+    }
+
+    #[test]
+    fn a_niche_with_observations_but_no_fit_shows_the_gap() {
+        // The state every niche is in for its first day: data arriving, nothing
+        // fittable yet. Showing 0 samples while the store holds observations reads as a
+        // broken collector, so the raw count is displayed alongside.
+        let r = hl_probe::CrowdingMeter::default().report("n", &[], 0);
+        let d = hl_probe::policy::decide(
+            &r,
+            &hl_core::EntryCost::default(),
+            &hl_probe::PolicyConfig::default(),
+        );
+        let table = decision_table(&[Row {
+            label: "n".into(),
+            observations: 3,
+            decision: d,
+            report: r,
+        }]);
+        assert!(table.contains("    3"), "raw count must appear: {table}");
+        assert!(table.contains("unknown"));
+        assert!(table.contains("none yet"));
     }
 
     #[test]
