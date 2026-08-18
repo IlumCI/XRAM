@@ -174,6 +174,31 @@ impl Confidence {
 pub const MIN_SAMPLES: usize = 6;
 pub const MIN_SPAN_DAYS: f64 = 0.5;
 
+/// What a venue says about automated participation.
+///
+/// Recorded as data rather than remembered, so the policy is visible in the repository
+/// and enforced by the code instead of by good intentions.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AutomationStance {
+    /// The venue documents that automated participation is acceptable.
+    Allowed,
+    /// Acceptable subject to conditions we believe we meet.
+    Conditional,
+    /// Unread or unclear. Blocks, because an unread policy is not consent.
+    Unknown,
+    /// The venue forbids it.
+    Forbidden,
+}
+
+impl AutomationStance {
+    /// Whether live participation may even be considered. `Unknown` deliberately fails
+    /// closed.
+    pub fn may_submit_live(self) -> bool {
+        matches!(self, AutomationStance::Allowed | AutomationStance::Conditional)
+    }
+}
+
 /// A venue supplies observations about one or more niches, for free.
 pub trait Source: Send + Sync {
     fn id(&self) -> &str;
@@ -181,4 +206,17 @@ pub trait Source: Send + Sync {
     fn niches(&self) -> anyhow::Result<Vec<Niche>>;
     /// Fresh observations since `since_ms`.
     fn observe(&self, since_ms: u64) -> anyhow::Result<Vec<Observation>>;
+}
+
+#[cfg(test)]
+mod stance_tests {
+    use super::*;
+
+    #[test]
+    fn an_unread_policy_is_not_consent() {
+        assert!(!AutomationStance::Unknown.may_submit_live());
+        assert!(!AutomationStance::Forbidden.may_submit_live());
+        assert!(AutomationStance::Allowed.may_submit_live());
+        assert!(AutomationStance::Conditional.may_submit_live());
+    }
 }

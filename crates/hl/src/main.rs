@@ -71,6 +71,9 @@ enum Cmd {
         #[arg(long, default_value = "halflife.toml")]
         config: PathBuf,
     },
+    /// Appraise what live competitions would actually pay, and whether they can be
+    /// entered without a person in the loop.
+    Appraise,
     /// Show realised yield per niche and verify the ledger chain.
     Ledger,
     /// Show free-tier quota consumed today.
@@ -189,6 +192,7 @@ fn main() -> Result<()> {
         }
         Cmd::Sweep { dry_run, config } => sweep(&state, &ledger, &governor, &config, dry_run),
         Cmd::Report { out, config } => report(&state, &out, &config),
+        Cmd::Appraise => appraise(),
         Cmd::Ledger => show_ledger(&ledger),
         Cmd::Quota => {
             for provider in default_limits().keys() {
@@ -553,5 +557,65 @@ fn report(state: &Path, out: &Path, config: &Path) -> Result<()> {
     );
     std::fs::write(out, md).with_context(|| format!("writing {}", out.display()))?;
     println!("\nwrote {}", out.display());
+    Ok(())
+}
+
+/// What the money actually looks like, once the naive arithmetic is set aside.
+fn appraise() -> Result<()> {
+    use hl_act::{appraise::Automatability, KaggleActuator};
+    use hl_venues::kaggle::KaggleSource;
+
+    if hl_venues::kaggle::auth_token().is_none() {
+        println!("no KAGGLE_KEY set; nothing to appraise.");
+        return Ok(());
+    }
+
+    let source = KaggleSource::new(Box::new(UreqTransport::default()));
+    let actuator = KaggleActuator::new(Box::new(UreqTransport::default()));
+    let now = now_millis();
+
+    // Niches carry the competition metadata we need; re-listing keeps this command
+    // independent of whether a sweep has run.
+    let comps = source.competitions()?;
+    println!(
+        "{:<44} {:>10} {:>7} {:>11} {:>12}  ENTRY",
+        "COMPETITION", "PRIZE", "TEAMS", "NAIVE/TEAM", "HONEST EV"
+    );
+    println!("{}", "-".repeat(104));
+
+    let mut automatable = 0;
+    for c in &comps {
+        if c.submissions_disabled {
+            continue;
+        }
+        let a = actuator.appraise(c, now, None)?;
+        if a.automatable.is_automatable() && a.prize_cents.is_some() {
+            automatable += 1;
+        }
+        println!(
+            "{:<44} {:>10} {:>7} {:>11} {:>12}  {}",
+            render::truncate_pub(&a.label, 44),
+            render::fmt_money(a.prize_cents),
+            a.competitors,
+            render::fmt_money(a.naive_per_competitor_cents().map(|v| v as u64)),
+            render::fmt_money(Some(a.expected_cents as u64)),
+            a.automatable.label(),
+        );
+    }
+
+    println!("\n{automatable} of {} competitions can be entered without a person in the loop.", comps.len());
+    println!(
+        "NAIVE/TEAM is prize divided by entrants. It is not an expected value and is shown\n\
+         only for contrast: prizes go to the top few, so HONEST EV stays at zero until we\n\
+         have actually placed in something."
+    );
+    if automatable == 0 {
+        println!(
+            "\nEvery cash competition here is {} or {}. That is the venue defending itself\n\
+             against automated entry.",
+            Automatability::NotebookOnly.label(),
+            Automatability::HumanJudged.label()
+        );
+    }
     Ok(())
 }

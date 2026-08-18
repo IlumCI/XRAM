@@ -129,3 +129,45 @@ all, and instrumenting crowding directly so you leave before the margin does.
 At zero capital and with no institutional standing, rotation speed is the only one of
 those available. That is what this repository builds. Its honest ceiling is stated in
 [THESIS.md](THESIS.md): rotation is an allocator, not a generator.
+
+---
+
+## 7. Automated competition entry
+
+Phase 4 of the build: enter machine-judged competitions automatically, on the reasoning
+that entry is free, automation is expected rather than resented, and the payoff
+distribution is fat-tailed.
+
+**Killed by:** the money is deliberately walled off from automation, and a survey of the
+live board says so unambiguously. Of 21 competitions:
+
+| Shape | Count | Automatable |
+|---|---|---|
+| Cash prize, notebook-only entry | 5 | no — the API cannot enter these at all |
+| Cash prize, human-judged prose | 1 | no |
+| Cash prize, file submission | 2 | yes |
+| No cash prize | 13 | pointless |
+
+Every large prize sat behind notebook-only submission — ARC-AGI at $850k and $700k,
+RSNA at $77k, Biohub at $60k, AI Agent Security at $50k. The two genuinely automatable
+cash competitions were the Pokémon strategy challenge and Kaggriculture, the latter the
+most crowded on the board at 5,185 teams for $50k.
+
+Two further blockers, both verified against the live API rather than assumed:
+
+* **There is no join endpoint.** Accepting competition rules is web-only; the API
+  answers submission calls with *"You do not have a Team in this Competition"* until a
+  person has accepted in their own name. The official CLI cannot do it either.
+* **Expected value was never what it looked like.** Prize divided by entrants — the
+  figure this project briefly quoted at $3,169/team — is not an expectation. Prizes go
+  to the top few, so a median entrant expects approximately nothing.
+
+**The pattern, one layer down.** Notebook-only submission is a venue defending itself
+against automated entry. That is this project's own thesis reappearing at the actuation
+layer: *what can be automated gets saturated, so whatever still pays has built a wall
+against automation.* And the wall is made of identity — an account, in a person's name,
+that has accepted terms. The same non-replicable input the whole search started from.
+
+What survives is the classification itself, in `hl-act`: the rare exception — real
+money, file submission, thin field — now gets flagged the day it appears rather than
+rediscovered by hand.

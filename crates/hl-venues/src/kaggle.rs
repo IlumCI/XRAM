@@ -63,6 +63,12 @@ impl KaggleSource {
         format!("https://www.kaggle.com/api/v1/competitions/list?page={page}")
     }
 
+    /// The competitions this source can see. Exposed so callers that need the full
+    /// records — appraisal, actuation — do not have to re-derive them from niches.
+    pub fn competitions(&self) -> Result<Vec<Competition>> {
+        self.fetch()
+    }
+
     fn fetch(&self) -> Result<Vec<Competition>> {
         let Some(token) = auth_token() else {
             return Ok(Vec::new());
@@ -110,6 +116,9 @@ pub struct Competition {
     pub category: String,
     #[serde(default)]
     pub submissions_disabled: bool,
+    /// True when entries must be a notebook run on Kaggle's infrastructure rather than
+    /// an uploaded file. Such competitions cannot be entered through the API at all.
+    pub is_kernels_only: bool,
 }
 
 impl Competition {
@@ -178,6 +187,8 @@ pub fn parse_competitions(body: &str) -> Result<Vec<Competition>> {
         category: String,
         #[serde(default, rename = "submissionsDisabled")]
         submissions_disabled: bool,
+        #[serde(default, rename = "isKernelsSubmissionsOnly")]
+        is_kernels_only: bool,
     }
     let raw: Vec<Raw> = serde_json::from_str(body).context("parsing kaggle competition list")?;
     Ok(raw
@@ -191,6 +202,7 @@ pub fn parse_competitions(body: &str) -> Result<Vec<Competition>> {
             enabled_date: r.enabled_date,
             category: r.category,
             submissions_disabled: r.submissions_disabled,
+            is_kernels_only: r.is_kernels_only,
         })
         .collect())
 }

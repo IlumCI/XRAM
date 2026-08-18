@@ -84,6 +84,11 @@ pub fn fmt_money(cents: Option<u64>) -> String {
     }
 }
 
+/// Public wrapper so other commands can share the table's truncation rule.
+pub fn truncate_pub(s: &str, n: usize) -> String {
+    truncate(s, n)
+}
+
 fn truncate(s: &str, n: usize) -> String {
     if s.chars().count() <= n {
         s.to_string()

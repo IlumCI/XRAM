@@ -8,7 +8,7 @@ is becoming and rotates out before the margin collapses. Everyone optimises thei
 almost nobody measures its half-life, so they all exit late.
 
 ```sh
-cargo test                      # 113 tests, no network
+cargo test                      # 136 tests, no network
 cargo run --bin hl -- demo      # full loop against niches with known half-lives
 cargo run --bin hl -- sweep     # poll every source, store, refresh REPORT.md
 ```
@@ -30,7 +30,7 @@ boring-but-alive (stable)    ENTER     812.4d                -        0%
 against whatever opportunity set exists; it cannot manufacture opportunity.
 
 - [docs/THESIS.md](docs/THESIS.md) — the reasoning and the design commitments
-- [docs/KILL-LIST.md](docs/KILL-LIST.md) — six strategies considered, and the 2026 fact
+- [docs/KILL-LIST.md](docs/KILL-LIST.md) — seven strategies considered, and the fact
   that killed each
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — how the code works
 

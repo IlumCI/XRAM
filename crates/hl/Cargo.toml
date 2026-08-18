@@ -20,3 +20,4 @@ hl-core.workspace = true
 hl-probe.workspace = true
 hl-scout.workspace = true
 hl-venues.workspace = true
+hl-act.workspace = true
