@@ -26,6 +26,15 @@ slow-program    (true 45d)   ENTER      44.1d       41.4-65.4d        9%
 boring-but-alive (stable)    ENTER     812.4d                -        0%
 ```
 
+**Tested, and it lost.** Over 1,353 days of real yield history, buy-and-hold returned
++16.34% against rotation's +8.95%, and a fee-aware variant with near-zero churn came
+last at +5.78%. Selection, not fees, is the defect: stablecoin yields mean-revert rather
+than decay, and a half-life model fitted to an oscillation reads confidently about a
+shape the data does not have. See [docs/KILL-LIST.md](docs/KILL-LIST.md) §8.
+
+`hl paper` is the command that produced that table, and it will produce it again against
+whatever the sweep has collected.
+
 **Honest ceiling:** rotation is an allocator, not a generator. It maximises yield
 against whatever opportunity set exists; it cannot manufacture opportunity.
 

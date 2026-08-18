@@ -75,6 +75,21 @@ enum Cmd {
     /// Appraise what live competitions would actually pay, and whether they can be
     /// entered without a person in the loop.
     Appraise,
+    /// Pull real daily history for the largest yield pools into the store, so the
+    /// paper portfolio has something to replay today rather than in a week.
+    Backfill {
+        #[arg(long, default_value_t = 40)]
+        pools: usize,
+    },
+    /// Replay stored observations and ask whether following the meter would have paid.
+    Paper {
+        /// Notional starting balance, in dollars.
+        #[arg(long, default_value_t = 1000.0)]
+        capital: f64,
+        /// How many niches to hold at once.
+        #[arg(long, default_value_t = 3)]
+        positions: usize,
+    },
     /// Show realised yield per niche and verify the ledger chain.
     Ledger,
     /// Show free-tier quota consumed today.
@@ -101,6 +116,9 @@ fn default_limits() -> HashMap<String, QuotaLimits> {
     m.insert("defillama".into(), QuotaLimits::new(5, 300, u64::MAX));
     // Hyperliquid is public and permissionless; one call covers every market.
     m.insert("hyperliquid".into(), QuotaLimits::new(5, 300, u64::MAX));
+    // Backfill is a burst of one request per pool, run by hand rather than hourly, so
+    // it gets its own generous-but-bounded bucket instead of eating the sweep's.
+    m.insert("defillama-history".into(), QuotaLimits::new(120, 600, u64::MAX));
     m
 }
 
@@ -210,6 +228,8 @@ fn main() -> Result<()> {
         Cmd::Sweep { dry_run, config } => sweep(&state, &ledger, &governor, &config, dry_run),
         Cmd::Report { out, config } => report(&state, &out, &config),
         Cmd::Appraise => appraise(),
+        Cmd::Backfill { pools } => backfill(&state, &governor, pools),
+        Cmd::Paper { capital, positions } => paper(&state, capital, positions),
         Cmd::Ledger => show_ledger(&ledger),
         Cmd::Quota => {
             for provider in default_limits().keys() {
@@ -642,5 +662,109 @@ fn appraise() -> Result<()> {
             Automatability::HumanJudged.label()
         );
     }
+    Ok(())
+}
+
+/// The one falsifiable question this project can answer for free.
+fn paper(state: &Path, capital: f64, positions: usize) -> Result<()> {
+    use hl_paper::{Backtest, PaperConfig};
+
+    let store = ObservationStore::open(state.join("observations.jsonl"))?;
+    let obs = store.read_all()?;
+    let bt = Backtest {
+        cfg: PaperConfig {
+            starting_cents: (capital * 100.0).round() as u64,
+            max_positions: positions.max(1),
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let r = bt.run(&obs);
+
+    println!(
+        "{:.2} days of history, {} eligible niches, {} steps, ${:.2} notional across {} slot(s)\n",
+        r.days, r.eligible_niches, r.steps, capital, positions
+    );
+    if r.outcomes.is_empty() {
+        println!("{}", r.warning.unwrap_or_else(|| "nothing to test".into()));
+        return Ok(());
+    }
+
+    println!(
+        "{:<22} {:>12} {:>10} {:>10} {:>9} {:>8}",
+        "STRATEGY", "FINAL", "RETURN", "ANNUALISED", "FEES", "SWITCHES"
+    );
+    println!("{}", "-".repeat(76));
+    for o in &r.outcomes {
+        println!(
+            "{:<22} {:>11.2} {:>9.4}% {:>9.2}% {:>8.2} {:>8}",
+            o.name,
+            o.final_cents / 100.0,
+            o.return_pct,
+            o.apy_pct,
+            o.fees_cents / 100.0,
+            o.switches
+        );
+    }
+
+    if let Some(w) = &r.warning {
+        println!("\n! {w}");
+    }
+
+    // The comparison that decides whether any of this was worth building.
+    let rot = r.get("rotation (meter)");
+    let chase = r.get("chase top rate");
+    let hold = r.get("hold best at start");
+    if let (Some(rot), Some(chase), Some(hold)) = (rot, chase, hold) {
+        println!();
+        let beats_hold = rot.final_cents - hold.final_cents;
+        let beats_chase = rot.final_cents - chase.final_cents;
+        println!(
+            "rotation vs hold:  {:+.2}   rotation vs naive chase:  {:+.2}",
+            beats_hold / 100.0,
+            beats_chase / 100.0
+        );
+        if r.warning.is_none() && beats_chase <= 0.0 {
+            println!(
+                "the meter is not earning its keep yet: chasing the top rate with no \n\
+                 estimator at all did as well or better."
+            );
+        }
+    }
+    Ok(())
+}
+
+/// Load real pool history so the backtest has a window worth measuring.
+fn backfill(state: &Path, governor: &Governor, pools: usize) -> Result<()> {
+    let src = DefiLlamaSource::new(Box::new(UreqTransport::default()));
+    // One request for the listing, then one per pool.
+    let cost = pools as u32 + 1;
+    let mut permits = Vec::new();
+    for _ in 0..cost {
+        match governor.acquire("defillama-history", 0) {
+            Ok(p) => permits.push(p),
+            Err(e) => {
+                println!("stopping before any calls: {e}");
+                return Ok(());
+            }
+        }
+    }
+    println!("fetching daily history for up to {pools} pools ({cost} requests)...");
+    let obs = src.backfill(pools)?;
+    for p in permits {
+        governor.settle(p, 0);
+    }
+
+    let mut store = ObservationStore::open(state.join("observations.jsonl"))?;
+    let added = store.append(&obs)?;
+    let span = match (obs.iter().map(|o| o.ts_ms).min(), obs.iter().map(|o| o.ts_ms).max()) {
+        (Some(a), Some(b)) => (b - a) as f64 / MS_PER_DAY,
+        _ => 0.0,
+    };
+    println!(
+        "{} points fetched, {added} new, spanning {span:.0} days across {} niches",
+        obs.len(),
+        obs.iter().map(|o| &o.niche_id).collect::<std::collections::BTreeSet<_>>().len()
+    );
     Ok(())
 }

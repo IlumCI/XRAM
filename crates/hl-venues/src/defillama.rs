@@ -25,6 +25,13 @@ use serde::Deserialize;
 
 pub const POOLS_URL: &str = "https://yields.llama.fi/pools";
 
+/// Per-pool daily history. Free and unauthenticated, and roughly 18 months deep, which
+/// is what makes the paper portfolio answerable today rather than after weeks of
+/// waiting for the sweep to accumulate its own history.
+pub fn chart_url(pool_id: &str) -> String {
+    format!("https://yields.llama.fi/chart/{pool_id}")
+}
+
 /// Which pools are worth tracking at all.
 #[derive(Debug, Clone)]
 pub struct PoolFilter {
@@ -134,6 +141,41 @@ impl DefiLlamaSource {
         1
     }
 
+    /// Pull daily history for the largest pools that pass the filter.
+    ///
+    /// Costs one request per pool, so it is deliberately capped and deliberately not
+    /// part of the hourly sweep.
+    pub fn backfill(&self, max_pools: usize) -> Result<Vec<Observation>> {
+        let pools = self.fetch()?;
+        let mut out = Vec::new();
+        let mut failures = 0usize;
+        for p in pools.iter().take(max_pools) {
+            let resp = match self
+                .transport
+                .get(&chart_url(&p.pool), &[("Accept", "application/json")])
+            {
+                Ok(r) if r.status == 200 => r,
+                // One missing history is not a reason to abandon the rest, but a run
+                // where most of them fail is not a backfill worth trusting either.
+                _ => {
+                    failures += 1;
+                    continue;
+                }
+            };
+            match parse_chart(&resp.body, &p.niche_id()) {
+                Ok(mut obs) => out.append(&mut obs),
+                Err(_) => failures += 1,
+            }
+        }
+        let attempted = pools.len().min(max_pools);
+        if attempted > 0 && failures * 2 > attempted {
+            anyhow::bail!(
+                "{failures} of {attempted} pool histories failed; refusing to backfill from that"
+            );
+        }
+        Ok(out)
+    }
+
     fn fetch(&self) -> Result<Vec<Pool>> {
         let resp = self
             .transport
@@ -143,6 +185,49 @@ impl DefiLlamaSource {
         }
         Ok(select(&parse_pools(&resp.body)?, &self.filter))
     }
+}
+
+#[derive(Deserialize)]
+struct ChartEnvelope {
+    #[serde(default)]
+    data: Vec<ChartPoint>,
+}
+
+#[derive(Deserialize)]
+struct ChartPoint {
+    timestamp: String,
+    #[serde(rename = "tvlUsd")]
+    tvl_usd: Option<f64>,
+    apy: Option<f64>,
+    #[serde(rename = "apyBase")]
+    apy_base: Option<f64>,
+}
+
+/// Turn a pool's history into observations, oldest first.
+///
+/// Uses `apyBase` where present for the same reason the live source does: the headline
+/// rate folds in emissions. Points without a usable rate are dropped rather than
+/// carried forward, since inventing a reading is how a backtest starts lying.
+pub fn parse_chart(body: &str, niche_id: &str) -> Result<Vec<Observation>> {
+    let env: ChartEnvelope = serde_json::from_str(body).context("parsing defillama chart")?;
+    let mut out = Vec::new();
+    for p in env.data {
+        let Some(ts) = crate::timefmt::parse_rfc3339_utc(&p.timestamp) else {
+            continue;
+        };
+        let Some(apy) = p.apy_base.or(p.apy) else { continue };
+        if !apy.is_finite() || apy <= 0.0 {
+            continue;
+        }
+        let mut o = Observation::new(niche_id, ts, "defillama")
+            .reward((apy * 100.0).round() as u64);
+        if let Some(tvl) = p.tvl_usd.filter(|v| *v > 0.0) {
+            o = o.competitors(tvl / 1000.0);
+        }
+        out.push(o);
+    }
+    out.sort_by_key(|o| o.ts_ms);
+    Ok(out)
 }
 
 #[derive(Deserialize)]
@@ -261,6 +346,46 @@ mod tests {
         DefiLlamaSource::new(Box::new(
             FixtureTransport::new().with(POOLS_URL, 200, body()),
         ))
+    }
+
+    const CHART: &str = r#"{"status":"success","data":[
+      {"timestamp":"2026-08-01T23:01:33.435Z","tvlUsd":2788150366,"apy":8.75,"apyBase":8.75},
+      {"timestamp":"2026-08-02T23:01:25.993Z","tvlUsd":2803500101,"apy":9.00,"apyBase":4.50},
+      {"timestamp":"2026-08-03T23:01:41.190Z","tvlUsd":2834008882,"apy":null,"apyBase":null},
+      {"timestamp":"not-a-date","tvlUsd":1,"apy":5.0,"apyBase":5.0}
+    ]}"#;
+
+    #[test]
+    fn history_parses_into_observations_oldest_first() {
+        let obs = parse_chart(CHART, "defi:x").unwrap();
+        assert_eq!(obs.len(), 2, "unparseable dates and empty rates are dropped");
+        assert!(obs[0].ts_ms < obs[1].ts_ms);
+        assert_eq!(obs[0].reward_cents, Some(875));
+        // apyBase over headline apy, exactly as the live source does.
+        assert_eq!(obs[1].reward_cents, Some(450));
+        assert_eq!(obs[0].competitors, Some(2_788_150.366));
+    }
+
+    #[test]
+    fn a_backfill_that_mostly_fails_is_refused() {
+        // Pool list resolves, but the histories do not. Returning the handful that did
+        // work would look like a backfill and behave like a hole.
+        let t = FixtureTransport::new().with(POOLS_URL, 200, body());
+        let src = DefiLlamaSource::new(Box::new(t));
+        let err = src.backfill(10).unwrap_err().to_string();
+        assert!(err.contains("refusing to backfill"), "got: {err}");
+    }
+
+    #[test]
+    fn a_backfill_returns_the_histories_it_could_fetch() {
+        let t = FixtureTransport::new()
+            .with(POOLS_URL, 200, body())
+            .with(chart_url("a"), 200, CHART)
+            .with(chart_url("b"), 200, CHART);
+        let src = DefiLlamaSource::new(Box::new(t));
+        let obs = src.backfill(10).unwrap();
+        assert_eq!(obs.len(), 4, "two pools, two usable points each");
+        assert!(obs.iter().any(|o| o.niche_id.contains("aave-v3")));
     }
 
     #[test]

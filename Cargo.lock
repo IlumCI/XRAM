@@ -326,6 +326,7 @@ dependencies = [
  "clap",
  "hl-act",
  "hl-core",
+ "hl-paper",
  "hl-probe",
  "hl-scout",
  "hl-venues",
@@ -366,6 +367,17 @@ dependencies = [
  "serde_json",
  "sha2",
  "tempfile",
+]
+
+[[package]]
+name = "hl-paper"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "hl-core",
+ "hl-probe",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

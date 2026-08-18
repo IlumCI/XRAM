@@ -171,3 +171,44 @@ that has accepted terms. The same non-replicable input the whole search started 
 What survives is the classification itself, in `hl-act`: the rare exception — real
 money, file submission, thin field — now gets flagged the day it appears rather than
 rediscovered by hand.
+
+---
+
+## 8. Rotation itself, on yield rates
+
+The project's own premise, tested against 1,353 days of real pool history pulled from
+DefiLlama's free per-pool endpoint. $1,000 notional, three slots, daily steps, no
+lookahead — the meter sees only observations timestamped at or before each step.
+
+| Strategy | Return | Annualised | Fees | Switches |
+| --- | --- | --- | --- | --- |
+| **hold best at start** | **+16.34%** | 4.41% | $0.70 | 1 |
+| chase top rate (no meter) | +11.23% | 3.03% | $156.58 | 405 |
+| rotation (meter) | +8.95% | 2.41% | $185.64 | 491 |
+| rotation (fee-aware) | +5.78% | 1.56% | $1.10 | 3 |
+
+**Killed by:** buy-and-hold beat every active strategy, and the meter did worse than
+naively chasing the top rate.
+
+The first reading was that fees did it — rotation paid $185.64 to earn $89.49, switching
+every 2.8 days. That produced a real fix, since the policy had no notion of switching
+cost at all: it emitted enter/hold/exit purely on runway without ever asking whether a
+move repays itself. A fee-aware variant with a breakeven hurdle cut fees to $1.10.
+
+It came last. **Selection, not churn, is the defect.** Near-zero fees and it still lost
+to holding.
+
+The specific diagnosis: the meter assumes a rate, once crowding starts, keeps decaying —
+that is what a half-life *is*. Stablecoin yields do not do that. They mean-revert. A
+pool paying well today tends to keep paying, and the pools that appear with spectacular
+new rates are precisely the ones that collapse. Fitting an exponential decay to an
+oscillation produces confident readings about a shape the data does not have.
+
+**Not pursued further, deliberately.** Trying variant after variant against the same
+1,353 days until one wins would produce a number that means nothing — that is
+overfitting a single sample, not evidence. The result stands as measured.
+
+Where the model might still hold is markets where crowding kills an opportunity
+*permanently* rather than temporarily: a new incentive programme, an airdrop window, a
+bounty niche that saturates and stays saturated. That is a testable claim and it has not
+been tested. It should not be believed until it is.

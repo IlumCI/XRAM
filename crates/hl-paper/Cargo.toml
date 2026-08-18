@@ -1,0 +1,14 @@
+[package]
+name = "hl-paper"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Paper portfolio: does following the meter actually beat holding?"
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+hl-core.workspace = true
+hl-probe.workspace = true
