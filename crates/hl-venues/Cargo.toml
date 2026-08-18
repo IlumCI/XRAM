@@ -1,0 +1,17 @@
+[package]
+name = "hl-venues"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Observation sources. Each source is one candidate income stream."
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+hl-core.workspace = true
+hl-probe.workspace = true
+ureq.workspace = true
+rustls.workspace = true
+rustls-pemfile.workspace = true

@@ -1,0 +1,13 @@
+[package]
+name = "hl-probe"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Crowding meter: estimates how fast a niche is closing, and when to leave."
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+hl-core.workspace = true

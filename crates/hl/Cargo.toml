@@ -1,0 +1,21 @@
+[package]
+name = "hl"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Halflife: measure how fast a niche is closing, and leave before it does."
+
+[[bin]]
+name = "hl"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+clap.workspace = true
+hl-core.workspace = true
+hl-probe.workspace = true
+hl-scout.workspace = true
+hl-venues.workspace = true

@@ -1,0 +1,13 @@
+[package]
+name = "hl-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Domain types, quota governor, EV triage and tamper-evident ledger for the Halflife."
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true

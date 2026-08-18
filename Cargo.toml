@@ -1,0 +1,40 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/hl-core",
+    "crates/hl-probe",
+    "crates/hl-scout",
+    "crates/hl-exec",
+    "crates/hl-venues",
+    "crates/hl",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+hl-core = { path = "crates/hl-core" }
+hl-probe = { path = "crates/hl-probe" }
+hl-scout = { path = "crates/hl-scout" }
+hl-exec = { path = "crates/hl-exec" }
+hl-venues = { path = "crates/hl-venues" }
+
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+rayon = "1"
+tempfile = "3"
+toml = "0.8"
+clap = { version = "4", features = ["derive"] }
+ureq = { version = "2", features = ["json"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+rustls-pemfile = "2"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
