@@ -114,6 +114,7 @@ impl Source for HuggingFaceSource {
                     requests: 1,
                     seconds: 5,
                 },
+                closes_ms: None,
                 source_url: Some(format!("https://huggingface.co/{}", n.kind.path())),
                 notes: "competitor density is new artefacts per day for this tag".into(),
             })

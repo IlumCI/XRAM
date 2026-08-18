@@ -21,6 +21,13 @@ pub struct Sighting {
     pub first_seen_ms: u64,
     /// When it actually opened, when the source knows.
     pub opened_ms: Option<u64>,
+    /// Published expiry, where the venue states one. Carried here because the report is
+    /// generated from stored observations, which have no idea a deadline exists.
+    #[serde(default)]
+    pub closes_ms: Option<u64>,
+    /// Human label, so the report can name a niche rather than print its id.
+    #[serde(default)]
+    pub label: String,
     pub source: String,
 }
 
@@ -100,10 +107,25 @@ impl SightingIndex {
             niche_id: niche.id.clone(),
             first_seen_ms: now_ms,
             opened_ms: niche.opened_ms,
+            closes_ms: niche.closes_ms,
+            label: niche.label.clone(),
             source: source.to_string(),
         };
         self.sightings.insert(niche.id.clone(), s.clone());
         Some(s)
+    }
+
+    /// Refresh the mutable facts about a niche we have already seen.
+    ///
+    /// Deadlines get extended and labels get renamed; first-sighting time never
+    /// changes, because that is the measurement this component is judged on.
+    pub fn refresh(&mut self, niche: &Niche) {
+        if let Some(s) = self.sightings.get_mut(&niche.id) {
+            s.closes_ms = niche.closes_ms;
+            if !niche.label.is_empty() {
+                s.label = niche.label.clone();
+            }
+        }
     }
 
     /// Median detection latency across everything we have dated, in milliseconds.
@@ -201,6 +223,7 @@ mod tests {
             opened_ms,
             first_seen_ms: 0,
             entry_cost: EntryCost::default(),
+            closes_ms: None,
             source_url: None,
             notes: String::new(),
         }
@@ -223,6 +246,21 @@ mod tests {
         let second = scout.sweep(&[&s], 2000);
         assert_eq!(second.new_niches.len(), 0, "re-seeing is not re-discovering");
         assert_eq!(second.checked, 2);
+    }
+
+    #[test]
+    fn refreshing_updates_the_deadline_but_never_the_first_sighting() {
+        let mut scout = Scout::new(SightingIndex::new());
+        let mut n = niche("n1", Some(1_000));
+        n.closes_ms = Some(5_000);
+        scout.sweep(&[&stub("a", vec![n.clone()])], 2_000);
+        assert_eq!(scout.index.get("n1").unwrap().closes_ms, Some(5_000));
+
+        n.closes_ms = Some(9_000);
+        scout.index.refresh(&n);
+        let s = scout.index.get("n1").unwrap();
+        assert_eq!(s.closes_ms, Some(9_000), "an extended deadline must be picked up");
+        assert_eq!(s.first_seen_ms, 2_000, "but lateness is not retroactively forgiven");
     }
 
     #[test]

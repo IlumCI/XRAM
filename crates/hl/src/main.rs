@@ -18,7 +18,7 @@ use hl_probe::{crowding::CrowdingMeter, policy, PolicyConfig};
 use hl_scout::{Scout, SightingIndex};
 use hl_venues::{
     github::GithubNiche, github_search::GithubSearchNiche, http::UreqTransport, huggingface::HfNiche,
-    GithubSearchSource, GithubSource, HuggingFaceSource, SimNiche, SimSource,
+    kaggle::KaggleSource, GithubSearchSource, GithubSource, HuggingFaceSource, SimNiche, SimSource,
 };
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -91,11 +91,20 @@ fn default_limits() -> HashMap<String, QuotaLimits> {
     // is all-or-nothing per source by design, since half a sweep fits a trend to half a
     // picture.
     m.insert("huggingface".into(), QuotaLimits::new(30, 2_000, u64::MAX));
+    // Kaggle documents no public rate limit; two listing pages an hour is negligible.
+    m.insert("kaggle".into(), QuotaLimits::new(10, 500, u64::MAX));
     m
 }
 
 /// Build the live sources described by the config.
-fn build_sources(cfg: &Config) -> (HuggingFaceSource, GithubSearchSource, Option<GithubSource>) {
+fn build_sources(
+    cfg: &Config,
+) -> (
+    HuggingFaceSource,
+    GithubSearchSource,
+    KaggleSource,
+    Option<GithubSource>,
+) {
     let mut hf: Vec<HfNiche> = cfg.hf_model_tags.iter().map(|t| HfNiche::models(t)).collect();
     hf.extend(cfg.hf_dataset_tags.iter().map(|t| HfNiche::datasets(t)));
 
@@ -118,6 +127,7 @@ fn build_sources(cfg: &Config) -> (HuggingFaceSource, GithubSearchSource, Option
     (
         HuggingFaceSource::new(hf, Box::new(UreqTransport::default())),
         GithubSearchSource::new(searches, Box::new(UreqTransport::default())),
+        KaggleSource::new(Box::new(UreqTransport::default())),
         (!repos.is_empty())
             .then(|| GithubSource::new(repos, Box::new(UreqTransport::default()))),
     )
@@ -241,6 +251,7 @@ fn demo(ledger: &Ledger, days: f64) -> Result<()> {
             label: format!("{} ({})", n.id, n.notes),
             decision,
             report,
+            value_cents: None,
         });
     }
 
@@ -330,6 +341,7 @@ fn watch(
             label: n.label.clone(),
             decision,
             report,
+            value_cents: None,
         });
     }
     print!("{}", render::decision_table(&rows));
@@ -381,9 +393,12 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
 
     if dry_run {
         println!("dry run: {} request(s) would be made\n", cfg.request_cost());
-        let (hf, gh, repos) = build_sources(&cfg);
+        let (hf, gh, kaggle, repos) = build_sources(&cfg);
         for n in hf.niches()?.iter().chain(gh.niches()?.iter()) {
             println!("  {}", n.id);
+        }
+        if kaggle.request_cost() == 0 {
+            println!("  (kaggle: no KAGGLE_KEY set, source skipped)");
         }
         if let Some(r) = &repos {
             for n in r.niches()? {
@@ -401,7 +416,7 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
     let before = store.len();
     let mut errors: Vec<String> = Vec::new();
 
-    let (hf, gh_search, gh_repos) = build_sources(&cfg);
+    let (hf, gh_search, kaggle, gh_repos) = build_sources(&cfg);
 
     let mut all: Vec<Observation> = Vec::new();
     let mut record = |src: &dyn Source, provider: &str, cost: u32| -> Result<()> {
@@ -410,6 +425,7 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
         // cannot measure it yet.
         if let Ok(niches) = src.niches() {
             for n in niches {
+                idx.refresh(&n);
                 if let Some(s) = idx.record(&n, src.id(), now) {
                     ledger.append(LedgerEvent::NicheDiscovered {
                         niche_id: s.niche_id.clone(),
@@ -429,6 +445,9 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
 
     record(&hf, "huggingface", hf.request_cost())?;
     record(&gh_search, "github-search", gh_search.request_cost())?;
+    if kaggle.request_cost() > 0 {
+        record(&kaggle, "kaggle", kaggle.request_cost())?;
+    }
     if let Some(r) = &gh_repos {
         record(r, "github", r.request_cost())?;
     }
@@ -457,6 +476,7 @@ fn report(state: &Path, out: &Path, config: &Path) -> Result<()> {
     let cfg = Config::load(config)?;
     let store = ObservationStore::open(state.join("observations.jsonl"))?;
     let obs = store.read_all()?;
+    let idx = SightingIndex::load(state.join("sightings.json"))?;
     let now = now_millis();
     let meter = CrowdingMeter::default();
     let policy_cfg = PolicyConfig::default();
@@ -464,12 +484,32 @@ fn report(state: &Path, out: &Path, config: &Path) -> Result<()> {
     let mut rows: Vec<render::Row> = Vec::new();
     for id in store.niche_ids()? {
         let r = meter.report(&id, &obs, now);
-        let d = policy::decide(&r, &hl_core::EntryCost::default(), &policy_cfg);
+        let sighting = idx.get(&id);
+        // A published deadline bounds the runway however healthy the trend looks.
+        let days_left = sighting
+            .and_then(|s| s.closes_ms)
+            .map(|c| c.saturating_sub(now) as f64 / MS_PER_DAY);
+        let d = policy::decide_with_deadline(
+            &r,
+            &hl_core::EntryCost::default(),
+            &policy_cfg,
+            days_left,
+        );
+        let label = match sighting {
+            Some(s) if !s.label.is_empty() && s.label != id => format!("{id}  ({})", s.label),
+            _ => id.clone(),
+        };
+        let value_cents = obs
+            .iter()
+            .filter(|o| o.niche_id == id && o.reward_cents.is_some())
+            .max_by_key(|o| o.ts_ms)
+            .and_then(|o| o.reward_cents);
         rows.push(render::Row {
             observations: obs.iter().filter(|o| o.niche_id == id).count(),
-            label: id,
+            label,
             decision: d,
             report: r,
+            value_cents,
         });
     }
     // Undetermined niches sort last: they are pending, not promising.
@@ -498,7 +538,9 @@ fn report(state: &Path, out: &Path, config: &Path) -> Result<()> {
          {} observations across {} niches, spanning {:.1} days. \
          {actionable} of {} niches have enough evidence to act on.\n\n\
          `Insufficient` means not enough data yet, which is not the same as a bad niche. \
-         Runway is measured against the fast end of the confidence interval.\n\n\
+         Runway is the shorter of the measured trend (against the fast end of its \
+         confidence interval) and any published deadline. VALUE is the latest reward \
+         reading: bounty size for GitHub niches, prize per entering team for Kaggle.\n\n\
          ```\n{}```\n\n\
          Watching {} tag(s) and {} search(es). Regenerated by the scheduled sweep.\n",
         obs.len(),

@@ -19,6 +19,14 @@ pub struct Niche {
     /// and detection latency is the entire product.
     pub first_seen_ms: u64,
     pub entry_cost: EntryCost,
+    /// A known hard expiry, where the venue publishes one — a competition deadline, a
+    /// programme end date.
+    ///
+    /// This is categorically different from the statistical runway the meter estimates:
+    /// no amount of stable measurement tells you a contest closes on Tuesday. Without
+    /// it, a freshly-launched niche with three days left reads as "no measured erosion,
+    /// enter" — the most avoidable mistake this system could make.
+    pub closes_ms: Option<u64>,
     pub source_url: Option<String>,
     pub notes: String,
 }
@@ -27,6 +35,13 @@ impl Niche {
     /// How late we were to the window, in milliseconds.
     pub fn detection_latency_ms(&self) -> Option<u64> {
         self.opened_ms.map(|o| self.first_seen_ms.saturating_sub(o))
+    }
+
+    /// Days remaining until the published expiry, if there is one. Negative values are
+    /// clamped to zero: a closed window is closed, not retroactively open.
+    pub fn days_until_close(&self, now_ms: u64) -> Option<f64> {
+        self.closes_ms
+            .map(|c| c.saturating_sub(now_ms) as f64 / crate::MS_PER_DAY)
     }
 }
 

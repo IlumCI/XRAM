@@ -111,6 +111,7 @@ impl Source for GithubSearchSource {
                     requests: 1,
                     seconds: 60,
                 },
+                closes_ms: None,
                 source_url: Some("https://github.com/search".into()),
                 notes: "claim latency is a proxy: time from issue open to close".into(),
             })

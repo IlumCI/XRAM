@@ -119,6 +119,7 @@ impl Source for GithubSource {
                     requests: 1,
                     seconds: 60,
                 },
+                closes_ms: None,
                 source_url: Some(format!("https://github.com/{}/{}", n.owner, n.repo)),
                 notes: "claim latency is a proxy: time from issue open to close".into(),
             })

@@ -98,7 +98,8 @@ impl Source for SimSource {
                     requests: 1,
                     seconds: 30,
                 },
-                source_url: None,
+                closes_ms: None,
+            source_url: None,
                 notes: match n.reward_half_life_days {
                     Some(hl) => format!("ground truth: reward half-life {hl} days"),
                     None => "ground truth: stable".into(),

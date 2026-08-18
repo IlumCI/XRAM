@@ -8,7 +8,7 @@ is becoming and rotates out before the margin collapses. Everyone optimises thei
 almost nobody measures its half-life, so they all exit late.
 
 ```sh
-cargo test                      # 101 tests, no network
+cargo test                      # 113 tests, no network
 cargo run --bin hl -- demo      # full loop against niches with known half-lives
 cargo run --bin hl -- sweep     # poll every source, store, refresh REPORT.md
 ```
@@ -34,7 +34,9 @@ against whatever opportunity set exists; it cannot manufacture opportunity.
   that killed each
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — how the code works
 
-Sources are all free and unauthenticated where possible. Hugging Face tag saturation is
+Sources are all free. Kaggle needs a token (`KAGGLE_KEY`, as a repository secret for the
+scheduled run); everything else works unauthenticated, though a GitHub token raises
+search from 10 requests/minute to 1,000/hour. Hugging Face tag saturation is
 the cheapest honest crowding measurement available: one request returns the 100 newest
 artefacts for a tag, and the span they cover *is* the creation rate — `text-generation`
 runs at ~4,400 new models/day, `robotics` at ~90.

@@ -5,7 +5,7 @@
 //! confidence this system exists to avoid.
 
 use hl_core::Signal;
-use hl_probe::{CrowdingReport, Decision, Metric};
+use hl_probe::{CrowdingReport, Decision};
 
 /// One niche as it appears in the report.
 pub struct Row {
@@ -16,6 +16,9 @@ pub struct Row {
     pub observations: usize,
     pub decision: Decision,
     pub report: CrowdingReport,
+    /// Most recent reward reading, in cents. Its meaning is per-source and stated in
+    /// the report header: a bounty size on GitHub, value per entering team on Kaggle.
+    pub value_cents: Option<u64>,
 }
 
 pub fn signal_tag(s: Signal) -> &'static str {
@@ -41,40 +44,44 @@ pub fn fmt_days(d: Option<f64>) -> String {
 pub fn decision_table(rows: &[Row]) -> String {
     let mut out = String::new();
     out.push_str(&format!(
-        "{:<28} {:<6} {:>5} {:>9} {:>16} {:>8}  {}\n",
-        "NICHE", "SIGNAL", "OBS", "RUNWAY", "HALF-LIFE 95% CI", "WEEKLY", "BASIS"
+        "{:<34} {:<6} {:>5} {:>9} {:>10} {:>8}  {}\n",
+        "NICHE", "SIGNAL", "OBS", "RUNWAY", "VALUE", "WEEKLY", "BASIS"
     ));
-    out.push_str(&"-".repeat(112));
+    out.push_str(&"-".repeat(108));
     out.push('\n');
     for Row {
         label,
         observations,
         decision: d,
         report: r,
+        value_cents,
     } in rows
     {
-        let ci = r
-            .metrics
-            .iter()
-            .find(|m| m.metric == Metric::Reward)
-            .or_else(|| r.metrics.first())
-            .and_then(|m| m.fit.half_life_ci95())
-            .map(|(lo, hi)| format!("{lo:.1}-{hi:.1}d"))
-            .unwrap_or_else(|| "-".into());
         let basis: Vec<&str> = r.metrics.iter().map(|m| m.metric.label()).collect();
         out.push_str(&format!(
-            "{:<28} {:<6} {:>5} {:>9} {:>16} {:>7.0}%  {}\n",
-            truncate(label, 28),
+            "{:<34} {:<6} {:>5} {:>9} {:>10} {:>7.0}%  {}\n",
+            truncate(label, 34),
             signal_tag(d.signal),
             observations,
             fmt_days(d.runway_days),
-            ci,
+            fmt_money(*value_cents),
             r.weekly_decay * 100.0,
             if basis.is_empty() { "none yet".into() } else { basis.join(",") }
         ));
-        out.push_str(&format!("{:<28} {}\n", "", d.reason));
+        out.push_str(&format!("{:<34} {}\n", "", d.reason));
     }
     out
+}
+
+/// Money, at whatever precision is legible. Sub-dollar values keep their cents because
+/// a niche worth $0.09 per attempt and one worth $9 are different propositions.
+pub fn fmt_money(cents: Option<u64>) -> String {
+    match cents {
+        None => "-".into(),
+        Some(c) if c >= 100_000 => format!("${}k", c / 100_000),
+        Some(c) if c >= 100 => format!("${}", c / 100),
+        Some(c) => format!("${}.{:02}", c / 100, c % 100),
+    }
 }
 
 fn truncate(s: &str, n: usize) -> String {
@@ -112,10 +119,19 @@ mod tests {
             observations: 3,
             decision: d,
             report: r,
+            value_cents: None,
         }]);
         assert!(table.contains("    3"), "raw count must appear: {table}");
         assert!(table.contains("unknown"));
         assert!(table.contains("none yet"));
+    }
+
+    #[test]
+    fn money_stays_legible_across_four_orders_of_magnitude() {
+        assert_eq!(fmt_money(None), "-");
+        assert_eq!(fmt_money(Some(9)), "$0.09");
+        assert_eq!(fmt_money(Some(3_169_00)), "$3k");
+        assert_eq!(fmt_money(Some(4_100)), "$41");
     }
 
     #[test]

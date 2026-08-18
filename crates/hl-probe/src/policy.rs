@@ -46,7 +46,26 @@ pub struct Decision {
 
 /// Decide what to do about one niche.
 pub fn decide(report: &CrowdingReport, cost: &EntryCost, cfg: &PolicyConfig) -> Decision {
-    let runway = report.runway_days_conservative(cfg.floor_fraction);
+    decide_with_deadline(report, cost, cfg, None)
+}
+
+/// As [`decide`], but bounded by a published expiry.
+///
+/// The effective runway is the *shorter* of what the trend implies and what the calendar
+/// allows. A contest with two days left is a two-day runway however stable its metrics
+/// look, and statistics will never tell you that.
+pub fn decide_with_deadline(
+    report: &CrowdingReport,
+    cost: &EntryCost,
+    cfg: &PolicyConfig,
+    days_until_close: Option<f64>,
+) -> Decision {
+    let statistical = report.runway_days_conservative(cfg.floor_fraction);
+    let runway = match (statistical, days_until_close) {
+        (Some(s), Some(d)) => Some(s.min(d.max(0.0))),
+        (None, Some(d)) => Some(d.max(0.0)),
+        (s, None) => s,
+    };
     let mk = |signal: Signal, reason: String, blocked: bool| Decision {
         niche_id: report.niche_id.clone(),
         signal,
@@ -66,6 +85,18 @@ pub fn decide(report: &CrowdingReport, cost: &EntryCost, cfg: &PolicyConfig) -> 
             ),
             true,
         );
+    }
+
+    // A published deadline is hard evidence even when the trend is not yet measurable:
+    // there is nothing uncertain about a window that shuts on Friday.
+    if let Some(d) = days_until_close {
+        if d <= cfg.payback_days {
+            return mk(
+                Signal::Exit,
+                format!("closes in {d:.1}d, inside the {:.1}d payback", cfg.payback_days),
+                false,
+            );
+        }
     }
 
     if !report.confidence.is_actionable() {
@@ -93,9 +124,6 @@ pub fn decide(report: &CrowdingReport, cost: &EntryCost, cfg: &PolicyConfig) -> 
         );
     }
 
-    // Exits are judged against the fast end of the interval, entries against it too:
-    // being wrong about a runway is much more expensive in one direction.
-    let runway = report.runway_days_conservative(cfg.floor_fraction);
     match runway {
         None => mk(
             Signal::Enter,

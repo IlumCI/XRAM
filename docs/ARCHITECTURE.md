@@ -109,6 +109,17 @@ Each source is a candidate income stream, and all of them are free to poll.
   "watch these repos" into "find windows anywhere". Reuses `parse_issues` on the search
   envelope's items. Search is a much tighter rate bucket than the core API (30/min
   authenticated, 10 unauthenticated), so it gets its own provider in the governor.
+- **`kaggle`** — the cleanest niche in the array, because crowding is published rather
+  than inferred: `teamCount` is literally how many others are chasing the prize, so
+  expected value per entrant is a division. Two properties differ from every other
+  source. Reward is fixed while entrants accumulate, so value per team decays
+  mechanically; and each competition carries a **published deadline**, which no amount
+  of measurement would reveal. That deadline is carried on `Niche::closes_ms` and bounds
+  the runway directly — without it, a contest launched three days ago with two days left
+  reads as "no measured erosion, enter". Non-cash prizes ("Knowledge", "Swag") are left
+  unscored rather than recorded as zero, since they are a different kind of thing rather
+  than a cheap one. Absent a token the source reports nothing and the rest of the sweep
+  proceeds.
 - **`timefmt`** — RFC 3339 parsing without a datetime dependency. Accepts only the UTC
   `Z` form; an offset form is refused rather than silently mis-parsed, since every
   latency we measure depends on it.
@@ -130,6 +141,10 @@ require running code we did not write. A private working copy, a scrubbed enviro
 callers.
 
 ## Scheduled operation
+
+Secrets: `GITHUB_TOKEN` is supplied automatically; `KAGGLE_KEY` is optional and must be
+added as a repository secret. Credentials are read from the environment only and never
+written to the repository or the state branch.
 
 `.github/workflows/sweep.yml` runs `hl sweep` hourly on GitHub-hosted runners, free and
 uncapped because the repository is public. State is snapshotted to a separate `data`

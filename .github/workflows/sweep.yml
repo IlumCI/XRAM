@@ -59,6 +59,9 @@ jobs:
         env:
           # Raises search from 10 requests/minute on a shared runner IP to 1,000/hour.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional. Without it the Kaggle source reports nothing and the rest of the
+          # sweep proceeds normally, so a fork with no secret still works.
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
         run: ./target/release/hl --state state sweep
 
       - name: Publish state
