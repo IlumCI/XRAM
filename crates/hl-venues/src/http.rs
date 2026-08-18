@@ -37,6 +37,10 @@ fn read_body(resp: ureq::Response) -> Result<String> {
 
 pub trait Transport: Send + Sync {
     fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<HttpResponse>;
+
+    /// POST a body. Some read-only APIs are POST-shaped — Hyperliquid's `info`
+    /// endpoint takes a query object rather than a path — so this is still a read.
+    fn post(&self, url: &str, headers: &[(&str, &str)], body: &str) -> Result<HttpResponse>;
 }
 
 pub struct UreqTransport {
@@ -126,17 +130,14 @@ impl Default for UreqTransport {
     }
 }
 
-impl Transport for UreqTransport {
-    fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<HttpResponse> {
-        let mut req = self
-            .agent
-            .get(url)
-            .timeout(std::time::Duration::from_secs(self.timeout_secs))
-            .set("User-Agent", &self.user_agent);
-        for (k, v) in headers {
-            req = req.set(k, v);
-        }
-        match req.call() {
+impl UreqTransport {
+    fn send(&self, mut req: ureq::Request, body: Option<&str>) -> Result<HttpResponse> {
+        req = req.timeout(std::time::Duration::from_secs(self.timeout_secs));
+        let outcome = match body {
+            Some(b) => req.send_string(b),
+            None => req.call(),
+        };
+        match outcome {
             Ok(resp) => Ok(HttpResponse {
                 status: resp.status(),
                 body: read_body(resp)?,
@@ -147,8 +148,29 @@ impl Transport for UreqTransport {
                 status: code,
                 body: read_body(resp).unwrap_or_default(),
             }),
-            Err(e) => bail!("http error for {url}: {e}"),
+            Err(e) => bail!("http error for request: {e}"),
         }
+    }
+}
+
+impl Transport for UreqTransport {
+    fn post(&self, url: &str, headers: &[(&str, &str)], body: &str) -> Result<HttpResponse> {
+        let mut req = self.agent.post(url).set("User-Agent", &self.user_agent);
+        for (k, v) in headers {
+            req = req.set(k, v);
+        }
+        self.send(req, Some(body))
+    }
+
+    fn get(&self, url: &str, headers: &[(&str, &str)]) -> Result<HttpResponse> {
+        let mut req = self
+            .agent
+            .get(url)
+            .set("User-Agent", &self.user_agent);
+        for (k, v) in headers {
+            req = req.set(k, v);
+        }
+        self.send(req, None)
     }
 }
 
@@ -179,13 +201,22 @@ impl FixtureTransport {
     }
 }
 
-impl Transport for FixtureTransport {
-    fn get(&self, url: &str, _headers: &[(&str, &str)]) -> Result<HttpResponse> {
+impl FixtureTransport {
+    fn serve(&self, url: &str) -> Result<HttpResponse> {
         self.requests.lock().unwrap().push(url.to_string());
         match self.routes.lock().unwrap().get(url) {
             Some(r) => Ok(r.clone()),
             None => bail!("no fixture registered for {url}"),
         }
+    }
+}
+
+impl Transport for FixtureTransport {
+    fn get(&self, url: &str, _headers: &[(&str, &str)]) -> Result<HttpResponse> {
+        self.serve(url)
+    }
+    fn post(&self, url: &str, _headers: &[(&str, &str)], _body: &str) -> Result<HttpResponse> {
+        self.serve(url)
     }
 }
 

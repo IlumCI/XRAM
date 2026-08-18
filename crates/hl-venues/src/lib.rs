@@ -10,6 +10,7 @@ pub mod github_search;
 pub mod huggingface;
 pub mod kaggle;
 pub mod http;
+pub mod hyperliquid;
 pub mod sim;
 pub mod timefmt;
 
@@ -19,4 +20,5 @@ pub use github_search::{GithubSearchNiche, GithubSearchSource};
 pub use huggingface::{HfKind, HfNiche, HuggingFaceSource};
 pub use kaggle::{Competition, KaggleSource};
 pub use http::{FixtureTransport, HttpResponse, Transport, UreqTransport};
+pub use hyperliquid::{HyperliquidSource, Perp, PerpFilter};
 pub use sim::{SimNiche, SimSource};

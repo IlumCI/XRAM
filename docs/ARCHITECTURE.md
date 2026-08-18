@@ -132,6 +132,16 @@ Each source is a candidate income stream, and all of them are free to poll.
   spectacular unreachable rates, pools carrying impermanent-loss risk (a second,
   uncorrelated way to lose the position that a rate trend says nothing about), and
   DefiLlama's own flagged outliers. One unauthenticated request covers every pool.
+- **`hyperliquid`** — perpetual funding rates, and the purest crowding signal available
+  anywhere: a funding rate is the price one side of a trade pays the other *for being
+  crowded*, and it exists precisely to attract capital to the empty side until the
+  imbalance closes. The rate is the crowd, quoted in basis points, decaying as the crowd
+  arrives. |funding| maps to reward, open interest to competitor density. Chosen over
+  Gate, KuCoin, Binance and Bybit because it is permissionless — the centralised venues
+  need an account, which needs identity, which is the wall that killed most of this
+  project's earlier ideas; Binance and Bybit also geo-block this egress outright. The
+  response pairs assets to contexts positionally, so a length mismatch is refused rather
+  than silently misattributing every rate.
 - **`timefmt`** — RFC 3339 parsing without a datetime dependency. Accepts only the UTC
   `Z` form; an offset form is refused rather than silently mis-parsed, since every
   latency we measure depends on it.

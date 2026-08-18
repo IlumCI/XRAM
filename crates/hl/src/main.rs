@@ -19,7 +19,7 @@ use hl_scout::{Scout, SightingIndex};
 use hl_venues::{
     github::GithubNiche, github_search::GithubSearchNiche, http::UreqTransport, huggingface::HfNiche,
     kaggle::KaggleSource, DefiLlamaSource, GithubSearchSource, GithubSource, HuggingFaceSource,
-    SimNiche, SimSource,
+    HyperliquidSource, SimNiche, SimSource,
 };
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -99,6 +99,8 @@ fn default_limits() -> HashMap<String, QuotaLimits> {
     m.insert("kaggle".into(), QuotaLimits::new(10, 500, u64::MAX));
     // DefiLlama is free and unauthenticated, and one request covers every pool.
     m.insert("defillama".into(), QuotaLimits::new(5, 300, u64::MAX));
+    // Hyperliquid is public and permissionless; one call covers every market.
+    m.insert("hyperliquid".into(), QuotaLimits::new(5, 300, u64::MAX));
     m
 }
 
@@ -110,6 +112,7 @@ fn build_sources(
     GithubSearchSource,
     KaggleSource,
     DefiLlamaSource,
+    HyperliquidSource,
     Option<GithubSource>,
 ) {
     let mut hf: Vec<HfNiche> = cfg.hf_model_tags.iter().map(|t| HfNiche::models(t)).collect();
@@ -136,6 +139,7 @@ fn build_sources(
         GithubSearchSource::new(searches, Box::new(UreqTransport::default())),
         KaggleSource::new(Box::new(UreqTransport::default())),
         DefiLlamaSource::new(Box::new(UreqTransport::default())),
+        HyperliquidSource::new(Box::new(UreqTransport::default())),
         (!repos.is_empty())
             .then(|| GithubSource::new(repos, Box::new(UreqTransport::default()))),
     )
@@ -412,7 +416,8 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
 
     if dry_run {
         println!("dry run: {} request(s) would be made\n", cfg.request_cost());
-        let (hf, gh, kaggle, yields, repos) = build_sources(&cfg);
+        let (hf, gh, kaggle, yields, perps, repos) = build_sources(&cfg);
+        println!("  {} perp funding market(s) via hyperliquid", perps.filter.max_markets);
         println!("  {} yield pool(s) via defillama", yields.filter.max_pools);
         for n in hf.niches()?.iter().chain(gh.niches()?.iter()) {
             println!("  {}", n.id);
@@ -436,7 +441,7 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
     let before = store.len();
     let mut errors: Vec<String> = Vec::new();
 
-    let (hf, gh_search, kaggle, yields, gh_repos) = build_sources(&cfg);
+    let (hf, gh_search, kaggle, yields, perps, gh_repos) = build_sources(&cfg);
 
     let mut all: Vec<Observation> = Vec::new();
     let mut record = |src: &dyn Source, provider: &str, cost: u32| -> Result<()> {
@@ -466,6 +471,7 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
     record(&hf, "huggingface", hf.request_cost())?;
     record(&gh_search, "github-search", gh_search.request_cost())?;
     record(&yields, "defillama", yields.request_cost())?;
+    record(&perps, "hyperliquid", perps.request_cost())?;
     if kaggle.request_cost() > 0 {
         record(&kaggle, "kaggle", kaggle.request_cost())?;
     }

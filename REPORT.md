@@ -1,6 +1,6 @@
 # Halflife portfolio
 
-123 observations across 112 niches, spanning 0.1 days. 0 of 112 niches have enough evidence to act on.
+200 observations across 189 niches, spanning 0.1 days. 0 of 189 niches have enough evidence to act on.
 
 `Insufficient` means not enough data yet, which is not the same as a bad niche. Runway is the shorter of the measured trend (against the fast end of its confidence interval) and any published deadline. VALUE is the latest reward reading in its own unit: bounty size for GitHub, prize per entering team for Kaggle, annualised rate for yield pools.
 
@@ -230,6 +230,160 @@ hf:models:robotics  (hf models [r… ?          1   unknown          -       0% 
 hf:models:text-generation  (hf mo… ?          1   unknown          -       0%  none yet
                                    not enough data: 0 samples over 0.00d (need 6 over 0.5d)
 hf:models:time-series-forecasting… ?          1   unknown          -       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:AAVE  (AAVE perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ACE  (ACE perp f… ?          1   unknown    307.69%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ADA  (ADA perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:AERO  (AERO perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ALGO  (ALGO perp… ?          1   unknown     38.38%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:APT  (APT perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ARB  (ARB perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ASTER  (ASTER pe… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ATOM  (ATOM perp… ?          1   unknown     12.47%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:AVAX  (AVAX perp… ?          1   unknown      8.28%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:BCH  (BCH perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:BNB  (BNB perp f… ?          1   unknown      7.55%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:CASHCAT  (CASHCA… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:CC  (CC perp fun… ?          1   unknown     58.13%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:CHIP  (CHIP perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:CRV  (CRV perp f… ?          1   unknown      9.81%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:DOGE  (DOGE perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:DOT  (DOT perp f… ?          1   unknown      3.89%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ENA  (ENA perp f… ?          1   unknown      3.98%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ENS  (ENS perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ETC  (ETC perp f… ?          1   unknown      6.74%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ETH  (ETH perp f… ?          1   unknown      3.13%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ETHFI  (ETHFI pe… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:FARTCOIN  (FARTC… ?          1   unknown     29.29%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:FET  (FET perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:FIL  (FIL perp f… ?          1   unknown      7.82%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:GALA  (GALA perp… ?          1   unknown    183.53%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:GRAM  (GRAM perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:GRASS  (GRASS pe… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:HBAR  (HBAR perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:HEMI  (HEMI perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:HYPE  (HYPE perp… ?          1   unknown      5.98%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ICP  (ICP perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:JTO  (JTO perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:JUP  (JUP perp f… ?          1   unknown      7.70%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:KAITO  (KAITO pe… ?          1   unknown     19.74%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:LDO  (LDO perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:LINK  (LINK perp… ?          1   unknown      6.07%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:LIT  (LIT perp f… ?          1   unknown      9.05%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:LTC  (LTC perp f… ?          1   unknown      5.18%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:MEGA  (MEGA perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:MNT  (MNT perp f… ?          1   unknown      4.83%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:MON  (MON perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:MORPHO  (MORPHO … ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ONDO  (ONDO perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:OP  (OP perp fun… ?          1   unknown     14.51%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:PAXG  (PAXG perp… ?          1   unknown     10.77%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:PENDLE  (PENDLE … ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:PENGU  (PENGU pe… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:PEOPLE  (PEOPLE … ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:POL  (POL perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:PUMP  (PUMP perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:PURR  (PURR perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:RENDER  (RENDER … ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:SEI  (SEI perp f… ?          1   unknown      8.21%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:SKY  (SKY perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:SOL  (SOL perp f… ?          1   unknown      8.53%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:SPX  (SPX perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:STBL  (STBL perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:STRK  (STRK perp… ?          1   unknown     12.84%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:SYRUP  (SYRUP pe… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:TAO  (TAO perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:TIA  (TIA perp f… ?          1   unknown     16.44%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:TRUMP  (TRUMP pe… ?          1   unknown     11.52%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:UNI  (UNI perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:VIRTUAL  (VIRTUA… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:VVV  (VVV perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:WLFI  (WLFI perp… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:XLM  (XLM perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:XMR  (XMR perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:XPL  (XPL perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:XRP  (XRP perp f… ?          1   unknown     10.17%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ZEC  (ZEC perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:ZRO  (ZRO perp f… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:kBONK  (kBONK pe… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:kPEPE  (kPEPE pe… ?          1   unknown     10.95%       0%  none yet
+                                   not enough data: 0 samples over 0.00d (need 6 over 0.5d)
+perp:hyperliquid:kSHIB  (kSHIB pe… ?          1   unknown     10.95%       0%  none yet
                                    not enough data: 0 samples over 0.00d (need 6 over 0.5d)
 ```
 

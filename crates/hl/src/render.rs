@@ -34,7 +34,7 @@ pub enum ValueUnit {
 impl ValueUnit {
     /// Pick the unit from the niche id, since the reading's meaning follows its source.
     pub fn for_niche(niche_id: &str) -> ValueUnit {
-        if niche_id.starts_with("defi:") {
+        if niche_id.starts_with("defi:") || niche_id.starts_with("perp:") {
             ValueUnit::BasisPoints
         } else {
             ValueUnit::Money
@@ -173,6 +173,7 @@ mod tests {
         assert_eq!(fmt_value(Some(352), ValueUnit::Money), "$3");
         assert_eq!(fmt_value(None, ValueUnit::BasisPoints), "-");
         assert_eq!(ValueUnit::for_niche("defi:Base:aave-v3:USDC"), ValueUnit::BasisPoints);
+        assert_eq!(ValueUnit::for_niche("perp:hyperliquid:BTC"), ValueUnit::BasisPoints);
         assert_eq!(ValueUnit::for_niche("gh:owner/repo"), ValueUnit::Money);
     }
 

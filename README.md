@@ -8,7 +8,7 @@ is becoming and rotates out before the margin collapses. Everyone optimises thei
 almost nobody measures its half-life, so they all exit late.
 
 ```sh
-cargo test                      # 144 tests, no network
+cargo test                      # 152 tests, no network
 cargo run --bin hl -- demo      # full loop against niches with known half-lives
 cargo run --bin hl -- sweep     # poll every source, store, refresh REPORT.md
 ```
@@ -34,7 +34,9 @@ against whatever opportunity set exists; it cannot manufacture opportunity.
   that killed each
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — how the code works
 
-The largest source is **yield pools**: a rate that decays as capital floods in is
+The two largest sources are rate markets. **Perp funding** is the purest crowding signal
+there is — the rate one side pays the other *for being crowded*, which decays as capital
+arrives at the empty side. **Yield pools**: a rate that decays as capital floods in is
 precisely what this measures, so APY maps onto the reward metric and TVL onto competitor
 density with no new machinery. Unlike work markets, yield markets have no identity gate,
 no terms to accept, no per-item human step and no minimum position.
