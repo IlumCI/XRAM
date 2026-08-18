@@ -32,8 +32,10 @@ last at +5.78%. Selection, not fees, is the defect: stablecoin yields mean-rever
 than decay, and a half-life model fitted to an oscillation reads confidently about a
 shape the data does not have. See [docs/KILL-LIST.md](docs/KILL-LIST.md) §8.
 
-`hl paper` is the command that produced that table, and it will produce it again against
-whatever the sweep has collected.
+`hl paper` produced that table and will produce it again against whatever the sweep has
+collected. `hl cohort` tests the *premise* rather than a strategy — capital arrives, does
+the rate fall? — which is the check that should come first. Yield pools answer −0.15
+(no). Perp funding answers yes, with a half-life of about three hours.
 
 **Honest ceiling:** rotation is an allocator, not a generator. It maximises yield
 against whatever opportunity set exists; it cannot manufacture opportunity.

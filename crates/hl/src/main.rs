@@ -99,6 +99,14 @@ enum Cmd {
         #[arg(long, default_value_t = 0.67)]
         train: f64,
     },
+    /// Test the project's own premise: does crowding actually depress reward here?
+    Cohort {
+        /// Restrict to niches whose id starts with this prefix, e.g. `defi:` or `perp:`.
+        #[arg(long)]
+        prefix: Option<String>,
+        #[arg(long, default_value_t = 90)]
+        days: usize,
+    },
     /// Show realised yield per niche and verify the ledger chain.
     Ledger,
     /// Show free-tier quota consumed today.
@@ -240,6 +248,7 @@ fn main() -> Result<()> {
         Cmd::Backfill { pools } => backfill(&state, &governor, pools),
         Cmd::Paper { capital, positions } => paper(&state, capital, positions),
         Cmd::Tune { capital, train } => tune_cmd(&state, capital, train),
+        Cmd::Cohort { prefix, days } => cohort_cmd(&state, prefix.as_deref(), days),
         Cmd::Ledger => show_ledger(&ledger),
         Cmd::Quota => {
             for provider in default_limits().keys() {
@@ -818,5 +827,55 @@ fn tune_cmd(state: &Path, capital: f64, train_fraction: f64) -> Result<()> {
              its training score came from fitting the window it was scored on."
         );
     }
+    Ok(())
+}
+
+/// The premise, as a number, for whichever market is asked about.
+fn cohort_cmd(state: &Path, prefix: Option<&str>, days: usize) -> Result<()> {
+    use hl_paper::CohortStudy;
+
+    let store = ObservationStore::open(state.join("observations.jsonl"))?;
+    let all = store.read_all()?;
+    let obs: Vec<_> = all
+        .into_iter()
+        .filter(|o| prefix.map_or(true, |p| o.niche_id.starts_with(p)))
+        .collect();
+
+    let study = CohortStudy {
+        max_days: days,
+        ..Default::default()
+    };
+    let r = study.run(&obs);
+
+    println!(
+        "{} niches with enough history{}\n",
+        r.niches,
+        prefix.map(|p| format!(" under '{p}'")).unwrap_or_default()
+    );
+    if r.niches == 0 {
+        println!("nothing to study. Backfill history first, or drop the prefix filter.");
+        return Ok(());
+    }
+
+    println!("{:>6}  {:>14}  {:>14}", "DAY", "REWARD vs d0", "CROWD vs d0");
+    for (d, rew) in &r.reward_by_age {
+        if ![0usize, 7, 14, 30, 45, 60, 90].contains(d) {
+            continue;
+        }
+        let crowd = r
+            .crowd_by_age
+            .iter()
+            .find(|(cd, _)| cd == d)
+            .map(|(_, c)| format!("x{c:.2}"))
+            .unwrap_or_else(|| "-".into());
+        println!("{d:>6}  {rew:>13.3}  {crowd:>14}");
+    }
+
+    println!(
+        "\nwithin-niche correlation of log(crowd) against log(reward):\n           median {:.3}, negative in {:.0}% of niches",
+        r.median_correlation,
+        r.share_negative * 100.0
+    );
+    println!("\n{}", r.verdict);
     Ok(())
 }

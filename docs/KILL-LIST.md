@@ -238,3 +238,63 @@ Where the model might still hold is markets where crowding kills an opportunity
 *permanently* rather than temporarily: a new incentive programme, an airdrop window, a
 bounty niche that saturates and stays saturated. That is a testable claim and it has not
 been tested. It should not be believed until it is.
+
+---
+
+## 9. A different market — and where the premise actually holds
+
+§8 killed rotation on yield pools. The obvious objection is that the market was wrong,
+not the model, so the premise was tested directly in two markets rather than inferred
+from a strategy that lost.
+
+**The premise, stated as a measurement:** capital arrives, and the rate falls.
+
+### Yield pools: the premise fails
+
+139 stablecoin pools, aligned by their own age rather than calendar date and normalised
+to each pool's own first reading.
+
+| Days | Median rate vs day 0 | Median TVL vs day 0 |
+| --- | --- | --- |
+| 0 | 1.000 | ×1.00 |
+| 30 | 1.000 | ×1.36 |
+| 60 | 0.994 | **×2.07** |
+
+TVL doubles in sixty days and the median rate does not move. Within-pool, log(TVL)
+against log(APY) correlates at **−0.24**, negative in 67% of pools. The mechanism is
+present and far too weak to survive fees — roughly a quarter the strength the model
+assumes. On the repository's own stored history the same tool reports **−0.152**.
+
+These are pools *currently listed* above $300k TVL, so pools that collapsed and were
+delisted are absent. Survivorship makes even this optimistic.
+
+### Perp funding: the premise holds, a hundred times faster
+
+40 liquid Hyperliquid perps, 21 days of hourly funding. Taking every moment |funding|
+enters the top decile (≥20% APR) and looking forward:
+
+| Horizon | Median after | vs 11% baseline |
+| --- | --- | --- |
+| +1h | 30.1% APR | 2.75× |
+| +6h | 17.8% APR | 1.62× |
+| +24h | 11.0% APR | **1.00×, fully reverted** |
+
+Continuous episodes last a median of **2 hours**. The excess over baseline decays with a
+half-life of roughly **3.3 hours**.
+
+This is the shape the meter was built for — a window that opens, pays, and closes. It is
+simply two orders of magnitude faster than the design assumed. Consequences, plainly:
+
+* An **hourly** sweep sees a three-hour half-life perhaps twice before it is gone.
+* Six hours at 30% APR is 0.02% of notional. The window is real and thin.
+* Collecting it means holding a leveraged position through those hours, so price
+  movement dominates the funding earned unless the position is delta-neutral — which
+  needs a second venue and more capital.
+
+**Conclusion.** The model is not wrong everywhere; it was pointed at the wrong clock.
+Where crowding genuinely closes a window, that window closes in hours, and capturing it
+is a high-frequency, capital-intensive game rather than a passive one.
+
+Both tests ship as tools — `hl cohort` and the persistence estimator — so any new market
+can be asked the same question before a strategy is built on it. That is the sequence
+that was missing: test the premise, then build.
