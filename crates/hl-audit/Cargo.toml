@@ -1,0 +1,13 @@
+[package]
+name = "hl-audit"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "A review aid for a human auditor: maps the attack surface of verified contract source and flags patterns worth attention. It does not find bugs."
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+hl-venues.workspace = true

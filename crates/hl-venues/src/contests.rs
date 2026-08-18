@@ -28,6 +28,7 @@ use serde::Deserialize;
 
 pub const CANTINA_URL: &str = "https://cantina.xyz/api/v0/competitions";
 pub const SHERLOCK_URL: &str = "https://audits.sherlock.xyz/api/contests";
+pub const CODE4RENA_URL: &str = "https://code4rena.com/api/v1/audits";
 
 /// One authorized contest, normalised across platforms.
 #[derive(Debug, Clone)]
@@ -92,9 +93,9 @@ impl ContestsSource {
         self
     }
 
-    /// Cantina and Sherlock: one request each.
+    /// One request per platform.
     pub fn request_cost(&self) -> u32 {
-        2
+        3
     }
 
     pub fn fetch(&self) -> Result<Vec<Contest>> {
@@ -118,7 +119,16 @@ impl ContestsSource {
             Err(e) => errors.push(format!("sherlock: {e}")),
         }
 
-        // Both platforms failing is a real failure; one failing is survivable.
+        // All platforms failing is a real failure; one failing is survivable.
+        match self.transport.get(CODE4RENA_URL, &[("Accept", "application/json")]) {
+            Ok(r) if r.status == 200 => match parse_code4rena(&r.body) {
+                Ok(c) => out.extend(c),
+                Err(e) => errors.push(format!("code4rena: {e}")),
+            },
+            Ok(r) => errors.push(format!("code4rena: status {}", r.status)),
+            Err(e) => errors.push(format!("code4rena: {e}")),
+        }
+
         if out.is_empty() && !errors.is_empty() {
             anyhow::bail!("no contests fetched: {}", errors.join("; "));
         }
@@ -267,6 +277,69 @@ pub fn parse_sherlock(body: &str) -> Result<Vec<Contest>> {
         .collect())
 }
 
+// ---- Code4rena ----
+
+#[derive(Deserialize)]
+struct C4Envelope {
+    #[serde(default)]
+    data: C4Data,
+}
+
+#[derive(Deserialize, Default)]
+struct C4Data {
+    #[serde(default)]
+    audits: Vec<C4Audit>,
+}
+
+#[derive(Deserialize)]
+struct C4Audit {
+    #[serde(default)]
+    title: Option<String>,
+    #[serde(default)]
+    slug: String,
+    #[serde(default)]
+    status: String,
+    #[serde(rename = "formattedAmount", default)]
+    formatted_amount: Option<String>,
+    #[serde(rename = "startTime", default)]
+    start_time: Option<String>,
+    #[serde(rename = "endTime", default)]
+    end_time: Option<String>,
+    #[serde(rename = "codeAccess", default)]
+    code_access: String,
+}
+
+/// Pull the dollar figure out of Code4rena's "$135,000 in USDC" reward string.
+pub fn parse_c4_amount(s: &str) -> f64 {
+    let digits: String = s.chars().skip_while(|c| *c != '$').filter(|c| c.is_ascii_digit()).collect();
+    digits.parse::<f64>().unwrap_or(0.0)
+}
+
+pub fn parse_code4rena(body: &str) -> Result<Vec<Contest>> {
+    let env: C4Envelope = serde_json::from_str(body).context("parsing code4rena audits")?;
+    Ok(env
+        .data
+        .audits
+        .into_iter()
+        // Only public-code contests are open invitations to review.
+        .filter(|a| a.code_access.eq_ignore_ascii_case("public") || a.code_access.is_empty())
+        .map(|a| Contest {
+            platform: "code4rena",
+            slug: a.slug.clone(),
+            name: a.title.unwrap_or_else(|| a.slug.clone()),
+            prize_usd: a.formatted_amount.as_deref().map(parse_c4_amount).unwrap_or(0.0),
+            findings_so_far: None,
+            starts_ms: a.start_time.as_deref().and_then(parse_rfc3339_utc),
+            ends_ms: a.end_time.as_deref().and_then(parse_rfc3339_utc),
+            live: a.status.eq_ignore_ascii_case("active")
+                || a.status.eq_ignore_ascii_case("live")
+                || a.status.eq_ignore_ascii_case("open"),
+            kyc_required: false,
+            url: format!("https://code4rena.com/audits/{}", a.slug),
+        })
+        .collect())
+}
+
 impl Source for ContestsSource {
     fn id(&self) -> &str {
         &self.id
@@ -348,16 +421,43 @@ mod tests {
        "starts_at":1785000000,"ends_at":1786000000,"private":true}
     ]}"#;
 
+    const C4: &str = r#"{"data":{"audits":[
+      {"title":"C4 Live","slug":"2026-c4live","status":"Active","formattedAmount":"$500,000 in USDC",
+       "startTime":"2026-08-15T00:00:00Z","endTime":"2026-09-15T00:00:00Z","codeAccess":"public"}
+    ]}}"#;
+
     fn source(include_closed: bool) -> ContestsSource {
         let t = FixtureTransport::new()
             .with(CANTINA_URL, 200, CANTINA)
-            .with(SHERLOCK_URL, 200, SHERLOCK);
+            .with(SHERLOCK_URL, 200, SHERLOCK)
+            .with(CODE4RENA_URL, 200, C4);
         let s = ContestsSource::new(Box::new(t));
         if include_closed {
             s.including_closed()
         } else {
             s
         }
+    }
+
+    #[test]
+    fn code4rena_amount_parses_out_of_the_reward_string() {
+        assert_eq!(parse_c4_amount("$135,000 in USDC"), 135000.0);
+        assert_eq!(parse_c4_amount("$22,000 in USDC"), 22000.0);
+        assert_eq!(parse_c4_amount("TBD"), 0.0);
+    }
+
+    #[test]
+    fn code4rena_public_contests_parse_and_private_code_is_dropped() {
+        let body = r#"{"data":{"audits":[
+          {"title":"Live One","slug":"2026-live","status":"Active","formattedAmount":"$100,000 in USDC",
+           "startTime":"2026-08-15T00:00:00Z","endTime":"2026-09-15T00:00:00Z","codeAccess":"public"},
+          {"title":"Secret","slug":"2026-secret","status":"Active","formattedAmount":"$50,000 in USDC",
+           "codeAccess":"private"}
+        ]}}"#;
+        let c = parse_code4rena(body).unwrap();
+        assert_eq!(c.len(), 1, "private-code contests are not open invitations");
+        assert_eq!(c[0].prize_usd, 100000.0);
+        assert!(c[0].live);
     }
 
     #[test]
@@ -380,8 +480,9 @@ mod tests {
     #[test]
     fn both_platforms_are_merged_and_closed_ones_dropped_by_default() {
         let c = source(false).fetch().unwrap();
-        assert_eq!(c.len(), 3, "two live cantina + one public sherlock; done1 dropped");
+        assert_eq!(c.len(), 4, "two live cantina + one public sherlock + one c4; done1 dropped");
         assert!(c.iter().all(|x| x.live));
+        assert!(c.iter().any(|x| x.platform == "code4rena"));
     }
 
     #[test]
@@ -420,7 +521,8 @@ mod tests {
     fn one_platform_failing_still_returns_the_other() {
         let t = FixtureTransport::new()
             .with(CANTINA_URL, 200, CANTINA)
-            .with(SHERLOCK_URL, 500, "down");
+            .with(SHERLOCK_URL, 500, "down")
+            .with(CODE4RENA_URL, 500, "down");
         let s = ContestsSource::new(Box::new(t));
         let c = s.fetch().unwrap();
         assert!(c.iter().all(|x| x.platform == "cantina"));
@@ -431,7 +533,8 @@ mod tests {
     fn both_platforms_failing_is_an_error_not_silence() {
         let t = FixtureTransport::new()
             .with(CANTINA_URL, 503, "x")
-            .with(SHERLOCK_URL, 500, "y");
+            .with(SHERLOCK_URL, 500, "y")
+            .with(CODE4RENA_URL, 500, "z");
         assert!(ContestsSource::new(Box::new(t)).fetch().is_err());
     }
 }

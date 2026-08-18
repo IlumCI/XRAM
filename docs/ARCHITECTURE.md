@@ -142,7 +142,7 @@ Each source is a candidate income stream, and all of them are free to poll.
   project's earlier ideas; Binance and Bybit also geo-block this egress outright. The
   response pairs assets to contexts positionally, so a length mismatch is refused rather
   than silently misattributing every rate.
-- **`contests`** — authorized security-audit contests (Cantina, Sherlock), and the one
+- **`contests`** — authorized security-audit contests (Cantina, Sherlock, Code4rena), and the one
   non-rival seam in the whole source set. A contest is a public invitation to review a
   named scope for a prize; two reviewers who find different bugs are both paid, so
   crowding depletes only the stock of unfound bugs, published as a findings count. Prize
@@ -151,7 +151,8 @@ Each source is a candidate income stream, and all of them are free to poll.
   and private/invite-only contests are excluded because they are not open invitations.
   One null field in a live payload once failed the entire array parse — string fields
   that the API can return as null are `Option` with a fallback, so one bad element never
-  drops the batch.
+  drops the batch. Immunefi, CodeHawks, Hats and Secure3 have no clean public JSON
+  endpoint (single-page apps behind Cloudflare) and are deliberately not scraped.
 - **`timefmt`** — RFC 3339 parsing without a datetime dependency. Accepts only the UTC
   `Z` form; an offset form is refused rather than silently mis-parsed, since every
   latency we measure depends on it.
@@ -162,6 +163,30 @@ Each source is a candidate income stream, and all of them are free to poll.
 world as brand new and render detection latency meaningless. A failing source is
 recorded and stepped over rather than aborting the sweep. Median (not mean) detection
 latency, so one niche found years late does not swamp the statistic.
+
+## hl-audit
+
+A review aid for a human security auditor, and the code-level counterpart to the
+contest ranker: the ranker says which authorized contest to review, this maps where to
+look inside one.
+
+- **`source`** — fetches *verified, already-public* contract source from public
+  Blockscout instances (eth, base, arbitrum, optimism, polygon, gnosis), free and
+  keyless. It refuses unverified addresses with a clear reason; it never touches a live
+  contract, only the source the explorer already renders.
+- **`surface`** — a line/token-level heuristic map. It strips comments and string
+  literals (blanking, not deleting, so line numbers stay exact), inventories the
+  external state-changing functions that make up the real attack surface, and flags
+  ~15 well-known footgun patterns (`delegatecall`, `selfdestruct`, `tx.origin` auth,
+  low-level value calls, inline assembly, unchecked math, upgrade authorization, weak
+  randomness) at High/Medium/Low with the failure mode spelled out.
+
+It is emphatically not a bug finder. It does no dataflow, cannot judge reachability, and
+is blind by construction to business-logic errors — which are most real findings. A
+clean map means "nothing obvious in the known-footgun set", never "safe". Every flag is
+a place for a human to look, calibrated to over-flag, because a false positive costs a
+glance and a false negative costs a lead. This keeps it on the right side of the line:
+it sorts reading order for authorized review, and does not review, exploit, or submit.
 
 ## hl-exec
 

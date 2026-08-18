@@ -21,4 +21,5 @@ hl-probe.workspace = true
 hl-scout.workspace = true
 hl-venues.workspace = true
 hl-act.workspace = true
+hl-audit.workspace = true
 hl-paper.workspace = true

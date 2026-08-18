@@ -127,6 +127,17 @@ enum Cmd {
         #[arg(long)]
         no_kyc: bool,
     },
+    /// Map the attack surface of a verified contract, to guide a human review.
+    /// Reads only already-public source; finds no bugs, replaces no review.
+    Review {
+        /// Chain: eth, base, arbitrum, optimism, polygon, gnosis.
+        chain: String,
+        /// Contract address (must have verified source).
+        address: String,
+        /// Show every flag, not just the high-severity head.
+        #[arg(long)]
+        full: bool,
+    },
     /// Show realised yield per niche and verify the ledger chain.
     Ledger,
     /// Show free-tier quota consumed today.
@@ -275,6 +286,7 @@ fn main() -> Result<()> {
         Cmd::Cohort { prefix, days } => cohort_cmd(&state, prefix.as_deref(), days),
         Cmd::Hunt { capital, min_apy, entry_cost } => hunt_cmd(&governor, capital, min_apy, entry_cost),
         Cmd::Audit { min_days, no_kyc } => audit_cmd(&governor, min_days, no_kyc),
+        Cmd::Review { chain, address, full } => review_cmd(&chain, &address, full),
         Cmd::Ledger => show_ledger(&ledger),
         Cmd::Quota => {
             for provider in default_limits().keys() {
@@ -1038,6 +1050,62 @@ fn audit_cmd(governor: &Governor, min_days: f64, no_kyc: bool) -> Result<()> {
     }
     println!(
         "\nRanked by pot-per-finding: a big pool already split across hundreds of findings\n         is worse than a smaller under-reviewed one. This ranks WHERE to look; whether you\n         can find a valid, unique bug in that codebase is the actual work, and it is real\n         work. '$/FINDING' is contest crowding, not your expected payout."
+    );
+    Ok(())
+}
+
+/// Map a contract's attack surface for a human reviewer. Reads public verified source
+/// only; it does not find bugs, and a clean map is not a clean bill of health.
+fn review_cmd(chain: &str, address: &str, full: bool) -> Result<()> {
+    use hl_audit::{analyze, surface::Severity, fetch_sources};
+
+    let transport = UreqTransport::default();
+    let src = fetch_sources(&transport, chain, address)?;
+    let files: Vec<(String, String)> =
+        src.files.iter().map(|f| (f.path.clone(), f.code.clone())).collect();
+    let map = analyze(&files);
+
+    println!(
+        "{} on {}  ({} file(s), {} lines{})",
+        src.name,
+        src.chain,
+        src.files.len(),
+        src.total_lines(),
+        src.compiler.as_deref().map(|c| format!(", {c}")).unwrap_or_default()
+    );
+    println!(
+        "attack surface: {} external state-changing function(s), {} payable, surface score {}",
+        map.entry_points, map.payable_entry_points, map.surface_score
+    );
+    println!(
+        "flags: {} high, {} total\n",
+        map.high(),
+        map.flags.len()
+    );
+
+    let shown: Vec<_> = if full {
+        map.flags.iter().collect()
+    } else {
+        map.flags.iter().filter(|f| f.severity == Severity::High).collect()
+    };
+    if shown.is_empty() {
+        println!("(no {} flags)", if full { "" } else { "high-severity" });
+    } else {
+        for f in shown {
+            println!(
+                "  [{}] {:<22} {}:{}",
+                f.severity.tag(), f.category, f.file.rsplit('/').next().unwrap_or(&f.file), f.line
+            );
+            println!("        {}", f.snippet);
+            println!("        why: {}", f.why);
+        }
+    }
+    if !full && map.flags.len() > map.high() {
+        println!("\n{} lower-severity flag(s) hidden; --full to see them.", map.flags.len() - map.high());
+    }
+
+    println!(
+        "\nThis maps where to look. It does no dataflow and is blind to logic bugs, which\n         are most real findings. A clean map means nothing obvious in the known-footgun\n         set, never that the code is safe. The review is yours to do."
     );
     Ok(())
 }

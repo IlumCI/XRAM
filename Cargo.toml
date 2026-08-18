@@ -5,6 +5,7 @@ members = [
     "crates/hl-probe",
     "crates/hl-scout",
     "crates/hl-exec",
+    "crates/hl-audit",
     "crates/hl-paper",
     "crates/hl-venues",
     "crates/hl-act",
@@ -22,6 +23,7 @@ hl-core = { path = "crates/hl-core" }
 hl-probe = { path = "crates/hl-probe" }
 hl-scout = { path = "crates/hl-scout" }
 hl-exec = { path = "crates/hl-exec" }
+hl-audit = { path = "crates/hl-audit" }
 hl-paper = { path = "crates/hl-paper" }
 hl-venues = { path = "crates/hl-venues" }
 hl-act = { path = "crates/hl-act" }

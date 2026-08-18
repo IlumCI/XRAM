@@ -325,6 +325,7 @@ dependencies = [
  "anyhow",
  "clap",
  "hl-act",
+ "hl-audit",
  "hl-core",
  "hl-paper",
  "hl-probe",
@@ -341,6 +342,16 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "hl-core",
+ "hl-venues",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "hl-audit"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
  "hl-venues",
  "serde",
  "serde_json",
