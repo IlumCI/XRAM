@@ -12,3 +12,4 @@ serde.workspace = true
 serde_json.workspace = true
 hl-core.workspace = true
 hl-probe.workspace = true
+rayon.workspace = true

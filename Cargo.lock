@@ -376,6 +376,7 @@ dependencies = [
  "anyhow",
  "hl-core",
  "hl-probe",
+ "rayon",
  "serde",
  "serde_json",
 ]

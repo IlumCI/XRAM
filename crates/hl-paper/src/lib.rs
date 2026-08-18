@@ -7,6 +7,8 @@
 
 pub mod backtest;
 pub mod portfolio;
+pub mod tune;
 
 pub use backtest::{is_paper_eligible, Backtest, BacktestResult, Outcome};
 pub use portfolio::{PaperConfig, Portfolio, Position, RateSeries};
+pub use tune::{grid, tune, TuneResult, Variant};

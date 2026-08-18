@@ -204,9 +204,35 @@ pool paying well today tends to keep paying, and the pools that appear with spec
 new rates are precisely the ones that collapse. Fitting an exponential decay to an
 oscillation produces confident readings about a shape the data does not have.
 
-**Not pursued further, deliberately.** Trying variant after variant against the same
-1,353 days until one wins would produce a number that means nothing — that is
-overfitting a single sample, not evidence. The result stands as measured.
+### Then it was tuned properly, and still lost
+
+"Why not tune it until it wins" is the right question, and the answer is not "don't
+tune" — refining against evidence is the job. The trap is narrower: tuning and *scoring*
+on the same data. Run enough variants against one sample and the best wins by
+construction, its edge being the maximum of many draws from noise.
+
+So the history was split. 72 variants competed on 906 training days; the single winner
+was then run once on 446 days that took no part in choosing it.
+
+| | Return |
+| --- | --- |
+| Winner, on the training data that chose it | **+14.30%** |
+| Winner, on held-out data | **−0.06%** |
+| Buy-and-hold, same held-out window | **+5.77%** |
+| Median variant, same held-out window | +0.94% |
+
+Degradation of **+14.36 points**. The entire training edge was selection. Out of sample
+the tuned winner lost to buy-and-hold by nearly six points and lost to an arbitrary
+variant — the search ordered noise and nothing else.
+
+**The search also found a bug in its own benchmark**, which is the other thing this kind
+of work is for. `hold best at start` required a rate reading at the exact first
+millisecond of the window. Pools report at their own time of day, so exactly one niche
+of thirty-five qualified, and the benchmark was holding whichever pool was stamped
+earliest rather than whichever paid best — a coin toss that rotation was being measured
+against. It now ranks over a seven-day warm-up. On the full history the conclusion was
+unchanged (the earliest reporter happened to be a good pool), but the held-out figure
+moved from a nonsensical −0.06% to +5.77%.
 
 Where the model might still hold is markets where crowding kills an opportunity
 *permanently* rather than temporarily: a new incentive programme, an airdrop window, a

@@ -90,6 +90,15 @@ enum Cmd {
         #[arg(long, default_value_t = 3)]
         positions: usize,
     },
+    /// Search parameters on a training window, then score the winner once on data
+    /// that took no part in choosing it.
+    Tune {
+        #[arg(long, default_value_t = 1000.0)]
+        capital: f64,
+        /// Share of history used for training. The rest is held out.
+        #[arg(long, default_value_t = 0.67)]
+        train: f64,
+    },
     /// Show realised yield per niche and verify the ledger chain.
     Ledger,
     /// Show free-tier quota consumed today.
@@ -230,6 +239,7 @@ fn main() -> Result<()> {
         Cmd::Appraise => appraise(),
         Cmd::Backfill { pools } => backfill(&state, &governor, pools),
         Cmd::Paper { capital, positions } => paper(&state, capital, positions),
+        Cmd::Tune { capital, train } => tune_cmd(&state, capital, train),
         Cmd::Ledger => show_ledger(&ledger),
         Cmd::Quota => {
             for provider in default_limits().keys() {
@@ -766,5 +776,47 @@ fn backfill(state: &Path, governor: &Governor, pools: usize) -> Result<()> {
         obs.len(),
         obs.iter().map(|o| &o.niche_id).collect::<std::collections::BTreeSet<_>>().len()
     );
+    Ok(())
+}
+
+/// Parameter search, with the cost of searching reported alongside the result.
+fn tune_cmd(state: &Path, capital: f64, train_fraction: f64) -> Result<()> {
+    use hl_paper::{tune, PaperConfig};
+
+    let store = ObservationStore::open(state.join("observations.jsonl"))?;
+    let obs = store.read_all()?;
+    let base = PaperConfig {
+        starting_cents: (capital * 100.0).round() as u64,
+        ..Default::default()
+    };
+    let Some(r) = tune(&obs, &base, train_fraction) else {
+        println!("not enough history on both sides of the split to tune against.");
+        return Ok(());
+    };
+
+    println!(
+        "{} variants searched on {:.0} training days, scored once on {:.0} held-out days\n",
+        r.variants_tried, r.train_days, r.test_days
+    );
+    println!("  best on training data : {}", r.best_label);
+    println!("  its training return   : {:+.2}%   <- chosen by this, so it proves nothing", r.train_return_pct);
+    println!("  its HELD-OUT return   : {:+.2}%   <- the only number that counts", r.test_return_pct);
+    println!("  degradation           : {:+.2}%   <- what the search cost", r.degradation_pct);
+    println!();
+    println!("  buy-and-hold, held out: {:+.2}%", r.test_hold_return_pct);
+    println!("  median variant, held out: {:+.2}%   <- what an arbitrary choice scored", r.median_test_return_pct);
+    println!();
+    if r.survived {
+        println!(
+            "the winner beat both controls out of sample. That is weak evidence of a real\n\
+             effect — weak because it is one split of one asset class, and the honest next\n\
+             step is a different period or a different market, not a wider grid."
+        );
+    } else {
+        println!(
+            "the winner did not clear both controls out of sample. The search ordered noise:\n\
+             its training score came from fitting the window it was scored on."
+        );
+    }
     Ok(())
 }

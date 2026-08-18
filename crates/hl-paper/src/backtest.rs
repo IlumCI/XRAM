@@ -63,6 +63,14 @@ impl BacktestResult {
 /// Below this the annualised figures are noise dressed as signal.
 pub const MIN_MEANINGFUL_DAYS: f64 = 3.0;
 
+/// How long the buy-and-hold benchmark waits before judging which rates are best.
+///
+/// Long enough that every pool reporting daily has been heard from at least once. This
+/// gives the benchmark no forward information: it ranks on rates already published by
+/// then, and the strategies it is compared against are free to act over the same days.
+pub const OPENING_WARMUP_DAYS: f64 = 7.0;
+
+#[derive(Debug, Clone)]
 pub struct Backtest {
     pub cfg: PaperConfig,
     pub policy: PolicyConfig,
@@ -173,11 +181,18 @@ impl Backtest {
             ranked.into_iter().map(|(n, _)| n).collect()
         }));
 
-        // The floor: pick the best rates on day one and never move again.
+        // The floor: pick the best rates at the outset and never move again.
+        //
+        // Ranked over a short warm-up rather than at the first millisecond. Each pool
+        // reports at its own time of day, so requiring a reading at the exact global
+        // minimum admitted whichever pool happened to be stamped earliest — one niche
+        // out of thirty-five — and called it "best". That is not a benchmark, it is a
+        // coin toss, and rotation was being measured against it.
         let opening: Vec<String> = {
+            let warmup = start.saturating_add((OPENING_WARMUP_DAYS * MS_PER_DAY) as u64);
             let mut r: Vec<(String, f64)> = series
                 .niches()
-                .filter_map(|n| series.rate_at(n, start).map(|v| (n.clone(), v)))
+                .filter_map(|n| series.rate_at(n, warmup).map(|v| (n.clone(), v)))
                 .collect();
             r.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal));
             r.into_iter().map(|(n, _)| n).collect()
@@ -307,6 +322,35 @@ mod tests {
     }
 
     #[test]
+    fn the_hold_benchmark_ranks_on_rates_not_on_reporting_times() {
+        // Two pools reporting at different times of day. The worse pool reports first.
+        // Requiring a reading at the exact first timestamp would hand the benchmark to
+        // it and call that "hold the best".
+        let mut obs: Vec<Observation> = (0..60)
+            .map(|i| {
+                Observation::new("defi:early-but-poor", days_ms(i as f64) + 1, "defillama")
+                    .reward(100)
+            })
+            .collect();
+        obs.extend((0..60).map(|i| {
+            Observation::new("defi:late-but-rich", days_ms(i as f64) + 50_000_000, "defillama")
+                .reward(2000)
+        }));
+        let bt = Backtest {
+            cfg: PaperConfig { max_positions: 1, ..Default::default() },
+            ..Default::default()
+        };
+        let r = bt.run(&obs);
+        let hold = r.get("hold best at start").unwrap();
+        // 20% for most of two months should clearly beat 1%.
+        assert!(
+            hold.return_pct > 2.0,
+            "the benchmark took the earliest reporter rather than the best rate: {:.3}%",
+            hold.return_pct
+        );
+    }
+
+    #[test]
     fn funding_niches_are_measured_but_never_traded() {
         assert!(is_paper_eligible("defi:Base:aave-v3:USDC"));
         assert!(!is_paper_eligible("perp:hyperliquid:BTC"));
@@ -396,5 +440,50 @@ mod tests {
         let chase = r.get("chase top rate").unwrap();
         assert!(chase.switches > 2, "a flip-flopping rate should force switches");
         assert!(chase.fees_cents > 0.0, "and each switch must cost something");
+    }
+}
+
+#[cfg(test)]
+mod diagnose {
+    use super::*;
+
+    /// Not a test of behaviour — a probe for the held-out window anomaly.
+    #[test]
+    #[ignore]
+    fn dump_hold_on_a_late_window() {
+        let path = std::env::var("HL_OBS").unwrap_or_default();
+        let Ok(text) = std::fs::read_to_string(&path) else {
+            eprintln!("set HL_OBS to an observations.jsonl");
+            return;
+        };
+        let all: Vec<Observation> = text
+            .lines()
+            .filter(|l| !l.trim().is_empty())
+            .filter_map(|l| serde_json::from_str(l).ok())
+            .collect();
+        let mut ts: Vec<u64> = all.iter().map(|o| o.ts_ms).collect();
+        ts.sort_unstable();
+        let split = ts[0] + ((ts[ts.len() - 1] - ts[0]) as f64 * 0.67) as u64;
+        let test: Vec<Observation> = all.into_iter().filter(|o| o.ts_ms > split).collect();
+
+        let series = RateSeries::from_observations(test.iter());
+        let start = series.first_ts().unwrap();
+        let with_reading_at_start = series
+            .niches()
+            .filter(|n| series.rate_at(n, start).is_some())
+            .count();
+        eprintln!(
+            "test niches: {}, with a reading at the very first timestamp: {}",
+            series.niches().count(),
+            with_reading_at_start
+        );
+
+        let r = Backtest::default().run(&test);
+        for o in &r.outcomes {
+            eprintln!(
+                "{:<22} final {:.2} accrued {:.2} fees {:.2} switches {}",
+                o.name, o.final_cents, o.accrued_cents, o.fees_cents, o.switches
+            );
+        }
     }
 }
