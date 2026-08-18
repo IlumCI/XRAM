@@ -8,7 +8,7 @@
 //! authenticated, 10 unauthenticated — so each niche is deliberately one query, and the
 //! governor is configured for the search bucket rather than the core one.
 
-use crate::github::{auth_token, describe_failure, github_headers, parse_issues};
+use crate::github::{auth_token, describe_failure, github_headers, parse_issues_by_repo};
 use crate::http::Transport;
 use anyhow::{Context, Result};
 use hl_core::{EntryCost, Niche, NicheClass, Observation, Source};
@@ -147,7 +147,10 @@ pub fn parse_search(
     let env: SearchEnvelope =
         serde_json::from_str(body).context("parsing github search envelope")?;
     let items = serde_json::to_string(&env.items).unwrap_or_else(|_| "[]".into());
-    let obs = parse_issues(&items, niche_id, source, since_ms)?;
+    // `niche_id` names the *search*, not a market; each result is attributed to the
+    // repository it came from.
+    let _ = niche_id;
+    let obs = parse_issues_by_repo(&items, source, since_ms)?;
     Ok((env.total_count, obs))
 }
 
@@ -157,18 +160,36 @@ mod tests {
     use crate::http::FixtureTransport;
 
     const ENVELOPE: &str = r#"{"total_count":4210,"items":[
-      {"title":"Fix parser $500","created_at":"2026-08-01T00:00:00Z","closed_at":"2026-08-01T02:00:00Z","comments":3,"labels":[{"name":"bounty"}]},
-      {"title":"A PR","created_at":"2026-08-02T00:00:00Z","closed_at":"2026-08-02T01:00:00Z","comments":1,"labels":[],"pull_request":{"url":"x"}},
-      {"title":"Still open","created_at":"2026-08-03T00:00:00Z","closed_at":null,"comments":0,"labels":[]}
+      {"repository_url":"https://api.github.com/repos/acme/widgets","title":"Fix parser $500","created_at":"2026-08-01T00:00:00Z","closed_at":"2026-08-01T02:00:00Z","comments":3,"labels":[{"name":"bounty"}]},
+      {"repository_url":"https://api.github.com/repos/other/thing","title":"Ship it $250","created_at":"2026-08-01T00:00:00Z","closed_at":"2026-08-01T06:00:00Z","comments":1,"labels":[]},
+      {"repository_url":"https://api.github.com/repos/spam/bot","title":"auto $10","created_at":"2026-08-02T00:00:00Z","closed_at":"2026-08-02T00:02:00Z","comments":0,"labels":[]},
+      {"repository_url":"https://api.github.com/repos/acme/widgets","title":"A PR","created_at":"2026-08-02T00:00:00Z","closed_at":"2026-08-02T01:00:00Z","comments":1,"labels":[],"pull_request":{"url":"x"}},
+      {"repository_url":"https://api.github.com/repos/acme/widgets","title":"Still open","created_at":"2026-08-03T00:00:00Z","closed_at":null,"comments":0,"labels":[]}
     ]}"#;
 
     #[test]
-    fn unwraps_the_envelope_and_reuses_the_issue_parser() {
-        let (total, obs) = parse_search(ENVELOPE, "n", "gh", 0).unwrap();
+    fn results_are_split_into_one_niche_per_repository() {
+        // "Every bounty-labelled issue on GitHub" is a mixture of unrelated markets, and
+        // fitting one trend across it is meaningless.
+        let (total, obs) = parse_search(ENVELOPE, "search-name", "gh", 0).unwrap();
         assert_eq!(total, 4210);
-        assert_eq!(obs.len(), 1, "PRs and open issues are excluded as before");
-        assert_eq!(obs[0].reward_cents, Some(50_000));
-        assert_eq!(obs[0].claim_latency_ms, Some(2 * 3_600_000));
+        let ids: Vec<&str> = obs.iter().map(|o| o.niche_id.as_str()).collect();
+        assert!(ids.contains(&"gh:acme/widgets"));
+        assert!(ids.contains(&"gh:other/thing"));
+        assert!(
+            !ids.iter().any(|i| i.contains("search-name")),
+            "the search is not itself a market"
+        );
+    }
+
+    #[test]
+    fn automated_open_and_close_cycles_are_dropped() {
+        let (_, obs) = parse_search(ENVELOPE, "n", "gh", 0).unwrap();
+        assert!(
+            !obs.iter().any(|o| o.niche_id == "gh:spam/bot"),
+            "a two-minute open-close cycle is a bot, not a claimed bounty"
+        );
+        assert_eq!(obs.len(), 2, "PRs, open issues and bot cycles all excluded");
     }
 
     #[test]
@@ -204,6 +225,7 @@ mod tests {
         let t = FixtureTransport::new().with(n.url(), 200, ENVELOPE);
         let src = GithubSearchSource::new(vec![n], Box::new(t));
         assert_eq!(src.request_cost(), 1);
-        assert_eq!(src.observe(0).unwrap().len(), 1);
+        // Two usable issues from two repositories; one query, several niches.
+        assert_eq!(src.observe(0).unwrap().len(), 2);
     }
 }

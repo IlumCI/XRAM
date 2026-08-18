@@ -63,6 +63,14 @@ impl GithubSource {
     }
 }
 
+/// Below this, an issue was not *claimed* by anyone — it was opened and closed by
+/// automation. Measured against live data, 52% of bounty-labelled closures came in
+/// under five minutes with an identical reward string, which is a bot template rather
+/// than a labour market. Mixing those into a claim-latency trend does not add noise, it
+/// replaces the signal: as the bot repo grows, the trend reads as "work is being
+/// claimed faster", i.e. exactly the crowding conclusion the meter exists to draw.
+pub const MIN_PLAUSIBLE_CLAIM_MS: u64 = 10 * 60 * 1000;
+
 #[derive(Debug, Deserialize)]
 struct GhIssue {
     #[serde(default)]
@@ -78,6 +86,11 @@ struct GhIssue {
     /// measures review speed, not how fast work is claimed.
     #[serde(default)]
     pull_request: Option<serde_json::Value>,
+    /// Present on search results; used to split a cross-repo search into one niche per
+    /// repository, since "every bounty-labelled issue on GitHub" is a mixture of
+    /// unrelated markets rather than a market.
+    #[serde(default)]
+    repository_url: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -189,9 +202,40 @@ pub fn parse_issues(
     source: &str,
     since_ms: u64,
 ) -> Result<Vec<Observation>> {
+    parse_issues_inner(body, source, since_ms, &|_| Some(niche_id.to_string()))
+}
+
+/// Like [`parse_issues`], but assigns each issue to a niche named after its repository.
+///
+/// This is what a cross-repository search needs: one niche per market, so a degenerate
+/// repo shows up as its own obviously-degenerate niche instead of contaminating a
+/// shared one.
+pub fn parse_issues_by_repo(
+    body: &str,
+    source: &str,
+    since_ms: u64,
+) -> Result<Vec<Observation>> {
+    parse_issues_inner(body, source, since_ms, &|i| {
+        i.repository_url
+            .as_deref()
+            .and_then(|u| u.split("/repos/").nth(1))
+            .map(|slug| format!("gh:{slug}"))
+    })
+}
+
+fn parse_issues_inner(
+    body: &str,
+    source: &str,
+    since_ms: u64,
+    niche_of: &dyn Fn(&GhIssue) -> Option<String>,
+) -> Result<Vec<Observation>> {
     let issues: Vec<GhIssue> = serde_json::from_str(body).context("parsing github issue list")?;
     let mut out = Vec::new();
     for i in issues {
+        let Some(niche_id) = niche_of(&i) else {
+            continue;
+        };
+        let niche_id = niche_id.as_str();
         if i.pull_request.is_some() {
             continue;
         }
@@ -202,6 +246,9 @@ pub fn parse_issues(
             continue;
         };
         if closed < since_ms || closed < created {
+            continue;
+        }
+        if closed - created < MIN_PLAUSIBLE_CLAIM_MS {
             continue;
         }
         // The observation is timestamped when the work was *taken*, not when the issue
@@ -285,6 +332,7 @@ mod tests {
     const PAYLOAD: &str = r#"[
       {"title":"Fix parser $500 bounty","created_at":"2026-08-01T00:00:00Z","closed_at":"2026-08-01T02:00:00Z","comments":3,"labels":[{"name":"bounty"}]},
       {"title":"Add retries","created_at":"2026-08-02T00:00:00Z","closed_at":"2026-08-02T01:00:00Z","comments":7,"labels":[]},
+      {"title":"bot churn","created_at":"2026-08-05T00:00:00Z","closed_at":"2026-08-05T00:01:00Z","comments":0,"labels":[]},
       {"title":"A pull request","created_at":"2026-08-03T00:00:00Z","closed_at":"2026-08-03T05:00:00Z","comments":1,"labels":[],"pull_request":{"url":"x"}},
       {"title":"Still open","created_at":"2026-08-04T00:00:00Z","closed_at":null,"comments":0,"labels":[]}
     ]"#;
@@ -310,6 +358,15 @@ mod tests {
         let cut = parse_rfc3339_utc("2026-08-02T00:00:00Z").unwrap();
         let obs = parse_issues(PAYLOAD, "n", "github", cut).unwrap();
         assert_eq!(obs.len(), 1);
+    }
+
+    #[test]
+    fn implausibly_fast_closures_are_excluded_everywhere() {
+        let obs = parse_issues(PAYLOAD, "n", "github", 0).unwrap();
+        assert!(
+            obs.iter().all(|o| o.claim_latency_ms.unwrap() >= MIN_PLAUSIBLE_CLAIM_MS),
+            "a one-minute open-close cycle is automation, not a claim"
+        );
     }
 
     #[test]
