@@ -18,8 +18,8 @@ use hl_probe::{crowding::CrowdingMeter, policy, PolicyConfig};
 use hl_scout::{Scout, SightingIndex};
 use hl_venues::{
     github::GithubNiche, github_search::GithubSearchNiche, http::UreqTransport, huggingface::HfNiche,
-    kaggle::KaggleSource, DefiLlamaSource, GithubSearchSource, GithubSource, HuggingFaceSource,
-    HyperliquidSource, SimNiche, SimSource,
+    kaggle::KaggleSource, ContestsSource, DefiLlamaSource, GithubSearchSource, GithubSource,
+    HuggingFaceSource, HyperliquidSource, SimNiche, SimSource,
 };
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -118,6 +118,15 @@ enum Cmd {
         #[arg(long, default_value_t = 0.15)]
         entry_cost: f64,
     },
+    /// Rank live authorized audit contests by where skilled review time pays best.
+    Audit {
+        /// Minimum days of review runway left to bother listing a contest.
+        #[arg(long, default_value_t = 0.0)]
+        min_days: f64,
+        /// Hide contests that require KYC to collect.
+        #[arg(long)]
+        no_kyc: bool,
+    },
     /// Show realised yield per niche and verify the ledger chain.
     Ledger,
     /// Show free-tier quota consumed today.
@@ -147,6 +156,8 @@ fn default_limits() -> HashMap<String, QuotaLimits> {
     // Backfill is a burst of one request per pool, run by hand rather than hourly, so
     // it gets its own generous-but-bounded bucket instead of eating the sweep's.
     m.insert("defillama-history".into(), QuotaLimits::new(120, 600, u64::MAX));
+    // Two contest platforms, polled together; free and unauthenticated.
+    m.insert("contests".into(), QuotaLimits::new(5, 300, u64::MAX));
     m
 }
 
@@ -159,6 +170,7 @@ fn build_sources(
     KaggleSource,
     DefiLlamaSource,
     HyperliquidSource,
+    ContestsSource,
     Option<GithubSource>,
 ) {
     let mut hf: Vec<HfNiche> = cfg.hf_model_tags.iter().map(|t| HfNiche::models(t)).collect();
@@ -186,6 +198,7 @@ fn build_sources(
         KaggleSource::new(Box::new(UreqTransport::default())),
         DefiLlamaSource::new(Box::new(UreqTransport::default())),
         HyperliquidSource::new(Box::new(UreqTransport::default())),
+        ContestsSource::new(Box::new(UreqTransport::default())),
         (!repos.is_empty())
             .then(|| GithubSource::new(repos, Box::new(UreqTransport::default()))),
     )
@@ -261,6 +274,7 @@ fn main() -> Result<()> {
         Cmd::Tune { capital, train } => tune_cmd(&state, capital, train),
         Cmd::Cohort { prefix, days } => cohort_cmd(&state, prefix.as_deref(), days),
         Cmd::Hunt { capital, min_apy, entry_cost } => hunt_cmd(&governor, capital, min_apy, entry_cost),
+        Cmd::Audit { min_days, no_kyc } => audit_cmd(&governor, min_days, no_kyc),
         Cmd::Ledger => show_ledger(&ledger),
         Cmd::Quota => {
             for provider in default_limits().keys() {
@@ -467,8 +481,10 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
 
     if dry_run {
         println!("dry run: {} request(s) would be made\n", cfg.request_cost());
-        let (hf, gh, kaggle, yields, perps, repos) = build_sources(&cfg);
+        let (hf, gh, kaggle, yields, perps, contests, repos) = build_sources(&cfg);
         println!("  {} perp funding market(s) via hyperliquid", perps.filter.max_markets);
+        let _ = &contests;
+        println!("  audit contests via cantina + sherlock");
         println!("  {} yield pool(s) via defillama", yields.filter.max_pools);
         for n in hf.niches()?.iter().chain(gh.niches()?.iter()) {
             println!("  {}", n.id);
@@ -492,7 +508,7 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
     let before = store.len();
     let mut errors: Vec<String> = Vec::new();
 
-    let (hf, gh_search, kaggle, yields, perps, gh_repos) = build_sources(&cfg);
+    let (hf, gh_search, kaggle, yields, perps, contests, gh_repos) = build_sources(&cfg);
 
     let mut all: Vec<Observation> = Vec::new();
     let mut record = |src: &dyn Source, provider: &str, cost: u32| -> Result<()> {
@@ -523,6 +539,7 @@ fn sweep(state: &Path, ledger: &Ledger, governor: &Governor, config: &Path, dry_
     record(&gh_search, "github-search", gh_search.request_cost())?;
     record(&yields, "defillama", yields.request_cost())?;
     record(&perps, "hyperliquid", perps.request_cost())?;
+    record(&contests, "contests", contests.request_cost())?;
     if kaggle.request_cost() > 0 {
         record(&kaggle, "kaggle", kaggle.request_cost())?;
     }
@@ -967,6 +984,60 @@ fn hunt_cmd(governor: &Governor, capital: f64, min_apy: f64, entry_cost: f64) ->
     }
     println!(
         "\nTwo distortions this list cannot correct for: every pool here is one that has\n         not collapsed yet, and pools that died are absent from the source entirely."
+    );
+    Ok(())
+}
+
+/// Where a skilled reviewer should spend time. This ranks authorized contests; it does
+/// not review, submit, or fetch code. The human does the work inside the contest rules.
+fn audit_cmd(governor: &Governor, min_days: f64, no_kyc: bool) -> Result<()> {
+    use hl_venues::ContestsSource;
+
+    let mut permits = Vec::new();
+    for _ in 0..2 {
+        match governor.acquire("contests", 0) {
+            Ok(p) => permits.push(p),
+            Err(e) => { println!("{e}"); return Ok(()); }
+        }
+    }
+    let src = ContestsSource::new(Box::new(UreqTransport::default()));
+    let mut contests = src.fetch()?;
+    for p in permits { governor.settle(p, 0); }
+
+    let now = now_millis();
+    contests.retain(|c| c.prize_usd > 0.0);
+    contests.retain(|c| c.days_left(now).map_or(true, |d| d >= min_days));
+    if no_kyc {
+        contests.retain(|c| !c.kyc_required);
+    }
+
+    // Rank by marginal pot: prize divided by findings already in, so an under-reviewed
+    // pot outranks a bigger one that a hundred people have already combed. Contests with
+    // no published findings count fall back to the raw pot, flagged as unknown depth.
+    contests.sort_by(|a, b| {
+        let key = |c: &hl_venues::Contest| c.prize_per_finding().unwrap_or(c.prize_usd);
+        key(b).partial_cmp(&key(a)).unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    println!("{} live authorized contest(s)\n", contests.len());
+    println!(
+        "{:<30} {:>9} {:>8} {:>11} {:>7}  FLAGS",
+        "CONTEST", "POT", "FOUND", "$/FINDING", "DAYS"
+    );
+    println!("{}", "-".repeat(92));
+    for c in &contests {
+        println!(
+            "{:<30} {:>9} {:>8} {:>11} {:>7}  {}",
+            render::truncate_pub(&format!("{} [{}]", c.name, c.platform), 30),
+            format!("${:.0}", c.prize_usd),
+            c.findings_so_far.map(|f| f.to_string()).unwrap_or_else(|| "?".into()),
+            c.prize_per_finding().map(|v| format!("${v:.0}")).unwrap_or_else(|| "-".into()),
+            c.days_left(now).map(|d| format!("{d:.1}")).unwrap_or_else(|| "?".into()),
+            if c.kyc_required { "KYC" } else { "open" },
+        );
+    }
+    println!(
+        "\nRanked by pot-per-finding: a big pool already split across hundreds of findings\n         is worse than a smaller under-reviewed one. This ranks WHERE to look; whether you\n         can find a valid, unique bug in that codebase is the actual work, and it is real\n         work. '$/FINDING' is contest crowding, not your expected payout."
     );
     Ok(())
 }

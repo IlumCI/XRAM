@@ -298,3 +298,43 @@ is a high-frequency, capital-intensive game rather than a passive one.
 Both tests ship as tools — `hl cohort` and the persistence estimator — so any new market
 can be asked the same question before a strategy is built on it. That is the sequence
 that was missing: test the premise, then build.
+
+---
+
+## The turn: from extracting markets to serving one
+
+Eight extraction theses died to one law: *a market with free entry has no unpriced
+returns left in it.* By this point that was not a surprise, it was arithmetic — chasing
+it further would have been the same mistake in a new costume.
+
+So the frame changed. The only durable edges are a non-replicable input you own (none
+available here) or **skilled work applied where others will not bother**. Everything
+this project can do — surface, rank, measure crowding — is worth more pointed at the
+second than at hunting a free lunch that cannot exist.
+
+**Authorized security-audit contests** (`audit:` niches, Cantina + Sherlock) are the one
+seam found all session that is *non-rival*. A contest is a public, explicit invitation
+to review a named scope for a prize pool. Two reviewers who find two different bugs are
+both paid — crowding does not deplete the reward, only the stock of unfound bugs, which
+the platforms publish as a running findings count. So the crowding meter maps on for
+real rather than by analogy: prize is reward, findings-so-far is the crowd, the deadline
+is a hard close.
+
+Three things keep it honest, and they are the whole point:
+
+* **It is legitimate by construction.** Every niche is a published invitation. The tool
+  ranks *where* review time pays; it never fetches contract source, scans for
+  vulnerabilities, or submits anything. Private and invite-only contests are excluded
+  because they are not open invitations.
+* **It does not pretend to be passive.** The edge is skilled human work — finding a
+  valid, unique bug in real code. Entry cost is recorded as days of labour, and the
+  output says so in as many words. This is the direction chosen deliberately after
+  accepting that no zero-work version survives.
+* **`$/finding` is contest crowding, not expected payout.** It says a $2M pot already
+  split across 300 findings is a worse place to look than a fresh $200k one. It says
+  nothing about whether *you* can find a bug — that is the actual work, and the tool is
+  honest that it cannot do it for you.
+
+This is not a gold mine that pays while you sleep. It is a map of where the ground is
+least dug, handed to someone willing to dig. That is the only shape of durable edge the
+whole session found, and it is the true one.

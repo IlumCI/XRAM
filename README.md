@@ -8,7 +8,7 @@ is becoming and rotates out before the margin collapses. Everyone optimises thei
 almost nobody measures its half-life, so they all exit late.
 
 ```sh
-cargo test                      # 151 tests, no network
+cargo test                      # 194 tests, no network
 cargo run --bin hl -- demo      # full loop against niches with known half-lives
 cargo run --bin hl -- sweep     # poll every source, store, refresh REPORT.md
 ```

@@ -142,6 +142,16 @@ Each source is a candidate income stream, and all of them are free to poll.
   project's earlier ideas; Binance and Bybit also geo-block this egress outright. The
   response pairs assets to contexts positionally, so a length mismatch is refused rather
   than silently misattributing every rate.
+- **`contests`** — authorized security-audit contests (Cantina, Sherlock), and the one
+  non-rival seam in the whole source set. A contest is a public invitation to review a
+  named scope for a prize; two reviewers who find different bugs are both paid, so
+  crowding depletes only the stock of unfound bugs, published as a findings count. Prize
+  maps to reward, findings-so-far to the crowd, the contest deadline to a hard close.
+  The source surfaces and ranks; it never fetches contract source, scans, or submits,
+  and private/invite-only contests are excluded because they are not open invitations.
+  One null field in a live payload once failed the entire array parse — string fields
+  that the API can return as null are `Option` with a fallback, so one bad element never
+  drops the batch.
 - **`timefmt`** — RFC 3339 parsing without a datetime dependency. Accepts only the UTC
   `Z` form; an offset form is refused rather than silently mis-parsed, since every
   latency we measure depends on it.
