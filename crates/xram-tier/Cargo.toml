@@ -1,0 +1,10 @@
+[package]
+name = "xram-tier"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Core tier abstraction and cost model for XRAM."
+
+[dependencies]

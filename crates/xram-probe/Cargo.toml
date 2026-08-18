@@ -1,0 +1,18 @@
+[package]
+name = "xram-probe"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "M0 go/no-go probe: what does this machine's PCIe link actually sustain?"
+
+[[bin]]
+name = "xram-probe"
+path = "src/main.rs"
+
+[dependencies]
+xram-cuda = { path = "../xram-cuda" }
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true

@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  check:
+    # Runners have no NVIDIA driver. That is deliberate coverage: XRAM must
+    # build and unit-test with no GPU present, because libcuda is dlopen'd at
+    # runtime rather than linked. Performance numbers come from real hardware.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --all-features
+      - name: Test
+        run: cargo test --workspace --all-features
+      - name: Probe degrades cleanly without a GPU
+        run: |
+          set +e
+          cargo run --quiet -p xram-probe 2>&1 | tee out.txt
+          rc=${PIPESTATUS[0]}
+          set -e
+          # Exit 1 is "no CUDA", which is the expected outcome here. Exit 2
+          # would mean it ran and returned NO-GO; 0 means it ran and passed.
+          [ "$rc" = "1" ] || { echo "expected exit 1 without a GPU, got $rc"; exit 1; }
+          grep -q "must come from real hardware" out.txt
