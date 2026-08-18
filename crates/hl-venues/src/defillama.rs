@@ -85,6 +85,11 @@ pub struct Pool {
     pub il_risk: String,
     #[serde(rename = "apyPct7D")]
     pub apy_pct_7d: Option<f64>,
+    /// `single` or `multi`. A multi-asset position is a liquidity pair, and its yield is
+    /// trading fees earned against inventory risk — a different object entirely from a
+    /// single-asset lending rate quoting the same number.
+    #[serde(default)]
+    pub exposure: String,
 }
 
 impl Pool {

@@ -107,6 +107,17 @@ enum Cmd {
         #[arg(long, default_value_t = 90)]
         days: usize,
     },
+    /// Hunt live high-rate windows, ranked by what is actually realisable.
+    Hunt {
+        /// Capital to size the per-hour figures against, in dollars.
+        #[arg(long, default_value_t = 20.0)]
+        capital: f64,
+        #[arg(long, default_value_t = 100.0)]
+        min_apy: f64,
+        /// Assumed cost of entering and leaving, in dollars.
+        #[arg(long, default_value_t = 0.15)]
+        entry_cost: f64,
+    },
     /// Show realised yield per niche and verify the ledger chain.
     Ledger,
     /// Show free-tier quota consumed today.
@@ -249,6 +260,7 @@ fn main() -> Result<()> {
         Cmd::Paper { capital, positions } => paper(&state, capital, positions),
         Cmd::Tune { capital, train } => tune_cmd(&state, capital, train),
         Cmd::Cohort { prefix, days } => cohort_cmd(&state, prefix.as_deref(), days),
+        Cmd::Hunt { capital, min_apy, entry_cost } => hunt_cmd(&governor, capital, min_apy, entry_cost),
         Cmd::Ledger => show_ledger(&ledger),
         Cmd::Quota => {
             for provider in default_limits().keys() {
@@ -877,5 +889,84 @@ fn cohort_cmd(state: &Path, prefix: Option<&str>, days: usize) -> Result<()> {
         r.share_negative * 100.0
     );
     println!("\n{}", r.verdict);
+    Ok(())
+}
+
+/// Live high-rate windows, with the difference between quoted and realisable made
+/// impossible to miss.
+fn hunt_cmd(governor: &Governor, capital: f64, min_apy: f64, entry_cost: f64) -> Result<()> {
+    use hl_venues::{
+        defillama::{parse_pools, POOLS_URL},
+        hunt::{hunt, HuntFilter, RiskKind},
+        http::Transport,
+    };
+
+    let permit = match governor.acquire("defillama", 0) {
+        Ok(p) => p,
+        Err(e) => {
+            println!("{e}");
+            return Ok(());
+        }
+    };
+    let transport = UreqTransport::default();
+    let resp = transport.get(POOLS_URL, &[("Accept", "application/json")])?;
+    governor.settle(permit, 0);
+    if resp.status != 200 {
+        anyhow::bail!("defillama returned status {}", resp.status);
+    }
+    let pools = parse_pools(&resp.body)?;
+    let cands = hunt(
+        &pools,
+        &HuntFilter {
+            min_apy,
+            ..Default::default()
+        },
+    );
+
+    println!(
+        "{} candidates at or above {:.0}% APY, sized against ${:.2}\n",
+        cands.len(),
+        min_apy,
+        capital
+    );
+    println!(
+        "{:<32} {:>9} {:>9} {:>8} {:>9} {:>9}  WHAT THE RATE IS",
+        "POOL", "HEADLINE", "BASE", "EMIT%", "c/h base", "c/h head"
+    );
+    println!("{}", "-".repeat(116));
+    for c in &cands {
+        println!(
+            "{:<32} {:>8.0}% {:>8.0}% {:>7.0}% {:>9.3} {:>9.3}  {}{}",
+            render::truncate_pub(&format!("{}/{} {}", c.chain, c.project, c.symbol), 32),
+            c.apy,
+            c.apy_base,
+            c.emission_share * 100.0,
+            c.base_cents_per_hour(capital),
+            c.headline_cents_per_hour(capital),
+            c.risk.label(),
+            if c.stablecoin { ", stable principal" } else { "" },
+        );
+    }
+
+    let realisable: Vec<_> = cands.iter().filter(|c| c.risk == RiskKind::BaseYield).collect();
+    println!(
+        "\n{} of {} pay in the asset you deposit. The rest quote a rate in a token whose\n         price their own emissions are diluting, so the headline column is an upper bound\n         that assumes the token holds its value.",
+        realisable.len(),
+        cands.len()
+    );
+    if let Some(best) = realisable.first() {
+        match best.hours_to_repay(capital, entry_cost) {
+            Some(h) => println!(
+                "\nbest realisable: {} {} at {:.0}% base -> {:.3} c/hour on ${:.0}, \n\
+                 repaying a ${:.2} entry in {:.0}h",
+                best.chain, best.symbol, best.apy_base,
+                best.base_cents_per_hour(capital), capital, entry_cost, h
+            ),
+            None => println!("\nno candidate repays its entry cost from base yield alone."),
+        }
+    }
+    println!(
+        "\nTwo distortions this list cannot correct for: every pool here is one that has\n         not collapsed yet, and pools that died are absent from the source entirely."
+    );
     Ok(())
 }
