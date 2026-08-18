@@ -1,0 +1,17 @@
+[package]
+name = "xram-ratio"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Measures what XRAM's compressed tier would actually achieve on this machine's memory."
+
+[[bin]]
+name = "xram-ratio"
+path = "src/main.rs"
+
+[dependencies]
+xram-codec = { path = "../xram-codec" }
+clap.workspace = true
+lz4_flex.workspace = true

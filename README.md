@@ -48,7 +48,7 @@ Pre-alpha. Milestone M0 — the go/no-go measurement — is implemented.
 | **M0** PCIe probe: does batching recover the link? | implemented |
 | **M1** ublk device backed by VRAM, batched DMA | not started |
 | **M2** io_uring zero-copy, LBA coalescing | not started |
-| **M3** compressed DRAM tier | not started |
+| **M3** compressed DRAM tier | codec + slab pool done, tier integration pending |
 | **M4** four-tier policy + VRAM ballooning | not started |
 | **M5** deadlock/OOM hardening | not started |
 
@@ -70,6 +70,33 @@ cannot beat this machine's NVMe by enough to justify the deadlock risk of a
 userspace swap daemon, and the project should stop. That verdict is the point of
 M0.
 
+## Measured so far
+
+`xram-ratio` compresses real anonymous pages out of a running process, because
+a compression tier's value is a property of the data actually in your memory,
+not of a synthetic benchmark. Against 469 MiB sampled from a live process:
+
+| | |
+|---|---|
+| Compression ratio | **4.58x** (steady state, payload) |
+| Same-fill pages | 40.2% — held in the handle at zero storage cost |
+| Incompressible | 0.7% — stored raw rather than inflated |
+| Slab waste | 10.1% |
+| Compress | 0.77 GiB/s warm, single-threaded (12% over raw LZ4) |
+| Decompress | 1.82 GiB/s |
+
+That is well above the 2.5x the plan assumed, and it moves the capacity
+arithmetic: at this ratio a 12 GiB card would carry roughly 55 GiB of pages.
+
+Two caveats worth stating. The ratio is workload-dependent — this sample is one
+process on one machine, so **run it on yours**. And compression is not free:
+0.77 GiB/s per core bounds how fast pages can be demoted into the tier, which
+makes it a scaling constraint rather than a rounding error.
+
+```sh
+cargo run --release -p xram-ratio -- --pid $(pgrep -n your-process) --breakdown
+```
+
 ## Building
 
 Requires Rust 1.82+. `libcuda.so.1` is opened with `dlopen` at runtime and is
@@ -88,6 +115,7 @@ cargo test --workspace
 | `xram-cuda` | Runtime-`dlopen` binding to the CUDA driver API |
 | `xram-probe` | M0 go/no-go measurement |
 | `xram-codec` | Compressed-page codec and slab pool (M3) |
+| `xram-ratio` | Measures the compression tier against real memory |
 | `xram-tier` | Tier abstraction and cost model (M4) |
 
 ## License
