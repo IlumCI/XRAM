@@ -1,0 +1,44 @@
+{
+  "kaggle": {
+    "day": 20701,
+    "minute": 29810716,
+    "requests_today": 14,
+    "requests_this_minute": 2,
+    "tokens_today": 0
+  },
+  "hyperliquid": {
+    "day": 20701,
+    "minute": 29810716,
+    "requests_today": 7,
+    "requests_this_minute": 1,
+    "tokens_today": 0
+  },
+  "defillama": {
+    "day": 20701,
+    "minute": 29810716,
+    "requests_today": 7,
+    "requests_this_minute": 1,
+    "tokens_today": 0
+  },
+  "github-search": {
+    "day": 20701,
+    "minute": 29810716,
+    "requests_today": 14,
+    "requests_this_minute": 2,
+    "tokens_today": 0
+  },
+  "huggingface": {
+    "day": 20701,
+    "minute": 29810716,
+    "requests_today": 56,
+    "requests_this_minute": 8,
+    "tokens_today": 0
+  },
+  "contests": {
+    "day": 20701,
+    "minute": 29810716,
+    "requests_today": 21,
+    "requests_this_minute": 3,
+    "tokens_today": 0
+  }
+}
