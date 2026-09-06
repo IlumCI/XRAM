@@ -1,0 +1,2348 @@
+{
+  "sightings": {
+    "audit:cantina:c3bbae37-a6f4-45b0-acd9-92dbe01301ce": {
+      "niche_id": "audit:cantina:c3bbae37-a6f4-45b0-acd9-92dbe01301ce",
+      "first_seen_ms": 1787085747077,
+      "opened_ms": 1786392000000,
+      "closes_ms": 1787169600000,
+      "label": "Royco Day [cantina]",
+      "source": "contests"
+    },
+    "defi:Aptos:blackrock-buidl:BUIDL": {
+      "niche_id": "defi:Aptos:blackrock-buidl:BUIDL",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "blackrock-buidl BUIDL on Aptos",
+      "source": "defillama"
+    },
+    "defi:Arbitrum:aave-v3:USDC": {
+      "niche_id": "defi:Arbitrum:aave-v3:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 USDC on Arbitrum",
+      "source": "defillama"
+    },
+    "defi:Arbitrum:fluid-lending:USDC": {
+      "niche_id": "defi:Arbitrum:fluid-lending:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "fluid-lending USDC on Arbitrum",
+      "source": "defillama"
+    },
+    "defi:Arbitrum:pendle-v2:USDAI": {
+      "niche_id": "defi:Arbitrum:pendle-v2:USDAI",
+      "first_seen_ms": 1788514932536,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "pendle-v2 USDAI on Arbitrum",
+      "source": "defillama"
+    },
+    "defi:Arbitrum:pendle:USDAI": {
+      "niche_id": "defi:Arbitrum:pendle:USDAI",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "pendle USDAI on Arbitrum",
+      "source": "defillama"
+    },
+    "defi:Arbitrum:sky-lending:SUSDS": {
+      "niche_id": "defi:Arbitrum:sky-lending:SUSDS",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sky-lending SUSDS on Arbitrum",
+      "source": "defillama"
+    },
+    "defi:Arbitrum:spark-savings:USDS": {
+      "niche_id": "defi:Arbitrum:spark-savings:USDS",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "spark-savings USDS on Arbitrum",
+      "source": "defillama"
+    },
+    "defi:Arbitrum:usd-ai:SUSDAI": {
+      "niche_id": "defi:Arbitrum:usd-ai:SUSDAI",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "usd-ai SUSDAI on Arbitrum",
+      "source": "defillama"
+    },
+    "defi:Avalanche:avant-avusd:SAVUSD": {
+      "niche_id": "defi:Avalanche:avant-avusd:SAVUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "avant-avusd SAVUSD on Avalanche",
+      "source": "defillama"
+    },
+    "defi:Avalanche:blackrock-buidl:BUIDL": {
+      "niche_id": "defi:Avalanche:blackrock-buidl:BUIDL",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "blackrock-buidl BUIDL on Avalanche",
+      "source": "defillama"
+    },
+    "defi:Avalanche:centrifuge-protocol:USDC": {
+      "niche_id": "defi:Avalanche:centrifuge-protocol:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "centrifuge-protocol USDC on Avalanche",
+      "source": "defillama"
+    },
+    "defi:BSC:blackrock-buidl:BUIDL": {
+      "niche_id": "defi:BSC:blackrock-buidl:BUIDL",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "blackrock-buidl BUIDL on BSC",
+      "source": "defillama"
+    },
+    "defi:BSC:circle-usyc:USYC": {
+      "niche_id": "defi:BSC:circle-usyc:USYC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "circle-usyc USYC on BSC",
+      "source": "defillama"
+    },
+    "defi:BSC:lista-lending:U": {
+      "niche_id": "defi:BSC:lista-lending:U",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "lista-lending U on BSC",
+      "source": "defillama"
+    },
+    "defi:BSC:lista-lending:USD1": {
+      "niche_id": "defi:BSC:lista-lending:USD1",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "lista-lending USD1 on BSC",
+      "source": "defillama"
+    },
+    "defi:BSC:venus-core-pool:USDT": {
+      "niche_id": "defi:BSC:venus-core-pool:USDT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "venus-core-pool USDT on BSC",
+      "source": "defillama"
+    },
+    "defi:Base:centrifuge-protocol:USDC": {
+      "niche_id": "defi:Base:centrifuge-protocol:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "centrifuge-protocol USDC on Base",
+      "source": "defillama"
+    },
+    "defi:Base:gauntlet:GTUSDA": {
+      "niche_id": "defi:Base:gauntlet:GTUSDA",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "gauntlet GTUSDA on Base",
+      "source": "defillama"
+    },
+    "defi:Base:morpho-blue:BBQUSDC": {
+      "niche_id": "defi:Base:morpho-blue:BBQUSDC",
+      "first_seen_ms": 1787894784987,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue BBQUSDC on Base",
+      "source": "defillama"
+    },
+    "defi:Base:morpho-blue:CSCBUSDC": {
+      "niche_id": "defi:Base:morpho-blue:CSCBUSDC",
+      "first_seen_ms": 1788094559599,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue CSCBUSDC on Base",
+      "source": "defillama"
+    },
+    "defi:Base:morpho-blue:ETHENAUSDC": {
+      "niche_id": "defi:Base:morpho-blue:ETHENAUSDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue ETHENAUSDC on Base",
+      "source": "defillama"
+    },
+    "defi:Base:morpho-blue:GTUSDCP": {
+      "niche_id": "defi:Base:morpho-blue:GTUSDCP",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue GTUSDCP on Base",
+      "source": "defillama"
+    },
+    "defi:Base:morpho-blue:SIRLOINUSDC": {
+      "niche_id": "defi:Base:morpho-blue:SIRLOINUSDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue SIRLOINUSDC on Base",
+      "source": "defillama"
+    },
+    "defi:Base:morpho-blue:SPARKUSDC": {
+      "niche_id": "defi:Base:morpho-blue:SPARKUSDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue SPARKUSDC on Base",
+      "source": "defillama"
+    },
+    "defi:Base:morpho-blue:STEAKUSDC": {
+      "niche_id": "defi:Base:morpho-blue:STEAKUSDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue STEAKUSDC on Base",
+      "source": "defillama"
+    },
+    "defi:Base:morpho-blue:USDE": {
+      "niche_id": "defi:Base:morpho-blue:USDE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue USDE on Base",
+      "source": "defillama"
+    },
+    "defi:Ethereum:3jane-lending:USD3": {
+      "niche_id": "defi:Ethereum:3jane-lending:USD3",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "3jane-lending USD3 on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:aave-v3:GHO": {
+      "niche_id": "defi:Ethereum:aave-v3:GHO",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 GHO on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:aave-v3:RLUSD": {
+      "niche_id": "defi:Ethereum:aave-v3:RLUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 RLUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:aave-v3:SGHO": {
+      "niche_id": "defi:Ethereum:aave-v3:SGHO",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 SGHO on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:aave-v3:SUSDE": {
+      "niche_id": "defi:Ethereum:aave-v3:SUSDE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 SUSDE on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:aave-v3:USDC": {
+      "niche_id": "defi:Ethereum:aave-v3:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:aave-v3:USDE": {
+      "niche_id": "defi:Ethereum:aave-v3:USDE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 USDE on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:aave-v3:USDT": {
+      "niche_id": "defi:Ethereum:aave-v3:USDT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 USDT on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:apyx-protocol:APXUSD": {
+      "niche_id": "defi:Ethereum:apyx-protocol:APXUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "apyx-protocol APXUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:bitwise-uscc:USCC": {
+      "niche_id": "defi:Ethereum:bitwise-uscc:USCC",
+      "first_seen_ms": 1787277545595,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "bitwise-uscc USCC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:blackrock-buidl:BUIDL": {
+      "niche_id": "defi:Ethereum:blackrock-buidl:BUIDL",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "blackrock-buidl BUIDL on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:cap:STCUSD": {
+      "niche_id": "defi:Ethereum:cap:STCUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "cap STCUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:centrifuge-protocol:AUSD": {
+      "niche_id": "defi:Ethereum:centrifuge-protocol:AUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "centrifuge-protocol AUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:centrifuge-protocol:USAT": {
+      "niche_id": "defi:Ethereum:centrifuge-protocol:USAT",
+      "first_seen_ms": 1787862772793,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "centrifuge-protocol USAT on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:centrifuge-protocol:USDS": {
+      "niche_id": "defi:Ethereum:centrifuge-protocol:USDS",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "centrifuge-protocol USDS on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:circle-usyc:USYC": {
+      "niche_id": "defi:Ethereum:circle-usyc:USYC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "circle-usyc USYC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:compound-v3:USDC": {
+      "niche_id": "defi:Ethereum:compound-v3:USDC",
+      "first_seen_ms": 1787327425696,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "compound-v3 USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:compound-v3:USDT": {
+      "niche_id": "defi:Ethereum:compound-v3:USDT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "compound-v3 USDT on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:convex-finance:DOLA-SUSDE": {
+      "niche_id": "defi:Ethereum:convex-finance:DOLA-SUSDE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "convex-finance DOLA-SUSDE on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:curve-dex:DOLA-SUSDE": {
+      "niche_id": "defi:Ethereum:curve-dex:DOLA-SUSDE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "curve-dex DOLA-SUSDE on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:curve-dex:PYUSD-USDC": {
+      "niche_id": "defi:Ethereum:curve-dex:PYUSD-USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "curve-dex PYUSD-USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:curve-dex:USDC-CRVUSD": {
+      "niche_id": "defi:Ethereum:curve-dex:USDC-CRVUSD",
+      "first_seen_ms": 1787306038809,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "curve-dex USDC-CRVUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:curve-dex:USDC-RLUSD": {
+      "niche_id": "defi:Ethereum:curve-dex:USDC-RLUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "curve-dex USDC-RLUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:curve-dex:USDT-CRVUSD": {
+      "niche_id": "defi:Ethereum:curve-dex:USDT-CRVUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "curve-dex USDT-CRVUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:curve-llamalend:CRVUSD": {
+      "niche_id": "defi:Ethereum:curve-llamalend:CRVUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "curve-llamalend CRVUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:dolomite:USD1": {
+      "niche_id": "defi:Ethereum:dolomite:USD1",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "dolomite USD1 on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:ethena-usde:SUSDE": {
+      "niche_id": "defi:Ethereum:ethena-usde:SUSDE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ethena-usde SUSDE on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:falcon-finance:SUSDF": {
+      "niche_id": "defi:Ethereum:falcon-finance:SUSDF",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "falcon-finance SUSDF on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:fluid-dex:USDC-USDT": {
+      "niche_id": "defi:Ethereum:fluid-dex:USDC-USDT",
+      "first_seen_ms": 1787894784987,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "fluid-dex USDC-USDT on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:fluid-lending:USDC": {
+      "niche_id": "defi:Ethereum:fluid-lending:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "fluid-lending USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:fluid-lending:USDT": {
+      "niche_id": "defi:Ethereum:fluid-lending:USDT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "fluid-lending USDT on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:fluid-lite:USDC": {
+      "niche_id": "defi:Ethereum:fluid-lite:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "fluid-lite USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:frax:SFRAX": {
+      "niche_id": "defi:Ethereum:frax:SFRAX",
+      "first_seen_ms": 1787344976238,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "frax SFRAX on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:frax:SFRXUSD": {
+      "niche_id": "defi:Ethereum:frax:SFRXUSD",
+      "first_seen_ms": 1787112037744,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "frax SFRXUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:fx-protocol:FXUSDSTABILITYPOOLV2.0": {
+      "niche_id": "defi:Ethereum:fx-protocol:FXUSDSTABILITYPOOLV2.0",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "fx-protocol FXUSDSTABILITYPOOLV2.0 on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:goldfinch:USDC": {
+      "niche_id": "defi:Ethereum:goldfinch:USDC",
+      "first_seen_ms": 1787190783307,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "goldfinch USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:invesco-ustb:USTB": {
+      "niche_id": "defi:Ethereum:invesco-ustb:USTB",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "invesco-ustb USTB on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:mainstreet:MSUSD": {
+      "niche_id": "defi:Ethereum:mainstreet:MSUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "mainstreet MSUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:maple:USDC": {
+      "niche_id": "defi:Ethereum:maple:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "maple USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:maple:USDG": {
+      "niche_id": "defi:Ethereum:maple:USDG",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "maple USDG on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:maple:USDT": {
+      "niche_id": "defi:Ethereum:maple:USDT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "maple USDT on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:midas-rwa:USDC": {
+      "niche_id": "defi:Ethereum:midas-rwa:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "midas-rwa USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:ARMUSDCS": {
+      "niche_id": "defi:Ethereum:morpho-blue:ARMUSDCS",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue ARMUSDCS on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:BBQUSDC": {
+      "niche_id": "defi:Ethereum:morpho-blue:BBQUSDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue BBQUSDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:GTUSDCP": {
+      "niche_id": "defi:Ethereum:morpho-blue:GTUSDCP",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue GTUSDCP on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:PENDLEUSDC": {
+      "niche_id": "defi:Ethereum:morpho-blue:PENDLEUSDC",
+      "first_seen_ms": 1787262324683,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue PENDLEUSDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:SENPYUSDMAIN": {
+      "niche_id": "defi:Ethereum:morpho-blue:SENPYUSDMAIN",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue SENPYUSDMAIN on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:SENPYUSDPRIMEV2": {
+      "niche_id": "defi:Ethereum:morpho-blue:SENPYUSDPRIMEV2",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue SENPYUSDPRIMEV2 on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:SENRLUSDV2": {
+      "niche_id": "defi:Ethereum:morpho-blue:SENRLUSDV2",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue SENRLUSDV2 on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:SKYMONEYUSDSFLAGSHIP": {
+      "niche_id": "defi:Ethereum:morpho-blue:SKYMONEYUSDSFLAGSHIP",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue SKYMONEYUSDSFLAGSHIP on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:SKYMONEYUSDTSAVINGS": {
+      "niche_id": "defi:Ethereum:morpho-blue:SKYMONEYUSDTSAVINGS",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue SKYMONEYUSDTSAVINGS on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:SPARKUSDTBC": {
+      "niche_id": "defi:Ethereum:morpho-blue:SPARKUSDTBC",
+      "first_seen_ms": 1787536754161,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue SPARKUSDTBC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:STEAKCUSDC": {
+      "niche_id": "defi:Ethereum:morpho-blue:STEAKCUSDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue STEAKCUSDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:STEAKEURCV": {
+      "niche_id": "defi:Ethereum:morpho-blue:STEAKEURCV",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue STEAKEURCV on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:STEAKUSDC": {
+      "niche_id": "defi:Ethereum:morpho-blue:STEAKUSDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue STEAKUSDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:morpho-blue:STEAKUSDT": {
+      "niche_id": "defi:Ethereum:morpho-blue:STEAKUSDT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue STEAKUSDT on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:ondo-yield-assets:USDY": {
+      "niche_id": "defi:Ethereum:ondo-yield-assets:USDY",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ondo-yield-assets USDY on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:pareto-credit:USDC": {
+      "niche_id": "defi:Ethereum:pareto-credit:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "pareto-credit USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:re:REUSD": {
+      "niche_id": "defi:Ethereum:re:REUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "re REUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:reservoir-protocol:WSRUSD": {
+      "niche_id": "defi:Ethereum:reservoir-protocol:WSRUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "reservoir-protocol WSRUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:saturn:SUSDAT": {
+      "niche_id": "defi:Ethereum:saturn:SUSDAT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "saturn SUSDAT on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:sentora-curator:USDC": {
+      "niche_id": "defi:Ethereum:sentora-curator:USDC",
+      "first_seen_ms": 1788546389738,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sentora-curator USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:sentora:USDC": {
+      "niche_id": "defi:Ethereum:sentora:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sentora USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:sky-lending:SDAI": {
+      "niche_id": "defi:Ethereum:sky-lending:SDAI",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sky-lending SDAI on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:sky-lending:STUSDS": {
+      "niche_id": "defi:Ethereum:sky-lending:STUSDS",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sky-lending STUSDS on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:sky-lending:SUSDS": {
+      "niche_id": "defi:Ethereum:sky-lending:SUSDS",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sky-lending SUSDS on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:sky-lending:USDS": {
+      "niche_id": "defi:Ethereum:sky-lending:USDS",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sky-lending USDS on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:spark-savings:USDC": {
+      "niche_id": "defi:Ethereum:spark-savings:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "spark-savings USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:spark-savings:USDT": {
+      "niche_id": "defi:Ethereum:spark-savings:USDT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "spark-savings USDT on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:sparklend:DAI": {
+      "niche_id": "defi:Ethereum:sparklend:DAI",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sparklend DAI on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:sparklend:PYUSD": {
+      "niche_id": "defi:Ethereum:sparklend:PYUSD",
+      "first_seen_ms": 1787824321978,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sparklend PYUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:sparklend:USDS": {
+      "niche_id": "defi:Ethereum:sparklend:USDS",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sparklend USDS on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:sparklend:USDT": {
+      "niche_id": "defi:Ethereum:sparklend:USDT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sparklend USDT on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:strata-markets:SRUSDE": {
+      "niche_id": "defi:Ethereum:strata-markets:SRUSDE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "strata-markets SRUSDE on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:tori-finance:STRUSD": {
+      "niche_id": "defi:Ethereum:tori-finance:STRUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "tori-finance STRUSD on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:uniswap-v3:AUSD-USDC": {
+      "niche_id": "defi:Ethereum:uniswap-v3:AUSD-USDC",
+      "first_seen_ms": 1788496655455,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "uniswap-v3 AUSD-USDC on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Ethereum:usual-usd0:BUSD0": {
+      "niche_id": "defi:Ethereum:usual-usd0:BUSD0",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "usual-usd0 BUSD0 on Ethereum",
+      "source": "defillama"
+    },
+    "defi:Gnosis:sdai:SDAI": {
+      "niche_id": "defi:Gnosis:sdai:SDAI",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sdai SDAI on Gnosis",
+      "source": "defillama"
+    },
+    "defi:Mantle:aave-v3:SUSDE": {
+      "niche_id": "defi:Mantle:aave-v3:SUSDE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 SUSDE on Mantle",
+      "source": "defillama"
+    },
+    "defi:Monad:aave-v3:SYRUPUSDC": {
+      "niche_id": "defi:Monad:aave-v3:SYRUPUSDC",
+      "first_seen_ms": 1788287632620,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 SYRUPUSDC on Monad",
+      "source": "defillama"
+    },
+    "defi:Monad:aave-v3:USDE": {
+      "niche_id": "defi:Monad:aave-v3:USDE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 USDE on Monad",
+      "source": "defillama"
+    },
+    "defi:Monad:accountable:AUSD": {
+      "niche_id": "defi:Monad:accountable:AUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "accountable AUSD on Monad",
+      "source": "defillama"
+    },
+    "defi:Monad:accountable:USDC": {
+      "niche_id": "defi:Monad:accountable:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "accountable USDC on Monad",
+      "source": "defillama"
+    },
+    "defi:Monad:curvance:VUSD": {
+      "niche_id": "defi:Monad:curvance:VUSD",
+      "first_seen_ms": 1787104482259,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "curvance VUSD on Monad",
+      "source": "defillama"
+    },
+    "defi:Monad:euler-v2:AUSD": {
+      "niche_id": "defi:Monad:euler-v2:AUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "euler-v2 AUSD on Monad",
+      "source": "defillama"
+    },
+    "defi:Monad:morpho-blue:HYPERUSDCA": {
+      "niche_id": "defi:Monad:morpho-blue:HYPERUSDCA",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue HYPERUSDCA on Monad",
+      "source": "defillama"
+    },
+    "defi:Plasma:aave-v3:SUSDE": {
+      "niche_id": "defi:Plasma:aave-v3:SUSDE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 SUSDE on Plasma",
+      "source": "defillama"
+    },
+    "defi:Plasma:aave-v3:USDE": {
+      "niche_id": "defi:Plasma:aave-v3:USDE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 USDE on Plasma",
+      "source": "defillama"
+    },
+    "defi:Plasma:aave-v3:USDT0": {
+      "niche_id": "defi:Plasma:aave-v3:USDT0",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "aave-v3 USDT0 on Plasma",
+      "source": "defillama"
+    },
+    "defi:Plasma:fluid-lending:USDT0": {
+      "niche_id": "defi:Plasma:fluid-lending:USDT0",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "fluid-lending USDT0 on Plasma",
+      "source": "defillama"
+    },
+    "defi:Plasma:yuzu-money:SYZUSD": {
+      "niche_id": "defi:Plasma:yuzu-money:SYZUSD",
+      "first_seen_ms": 1787368143643,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "yuzu-money SYZUSD on Plasma",
+      "source": "defillama"
+    },
+    "defi:Robinhood Chain:morpho-blue:STEAKUSDG": {
+      "niche_id": "defi:Robinhood Chain:morpho-blue:STEAKUSDG",
+      "first_seen_ms": 1787655096012,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue STEAKUSDG on Robinhood Chain",
+      "source": "defillama"
+    },
+    "defi:Robinhood Chain:morpho-blue:USDE": {
+      "niche_id": "defi:Robinhood Chain:morpho-blue:USDE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue USDE on Robinhood Chain",
+      "source": "defillama"
+    },
+    "defi:Robinhood Chain:spark-savings:USDG": {
+      "niche_id": "defi:Robinhood Chain:spark-savings:USDG",
+      "first_seen_ms": 1788013836105,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "spark-savings USDG on Robinhood Chain",
+      "source": "defillama"
+    },
+    "defi:Sei:ondo-yield-assets:USDY": {
+      "niche_id": "defi:Sei:ondo-yield-assets:USDY",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ondo-yield-assets USDY on Sei",
+      "source": "defillama"
+    },
+    "defi:Solana:blackrock-buidl:BUIDL": {
+      "niche_id": "defi:Solana:blackrock-buidl:BUIDL",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "blackrock-buidl BUIDL on Solana",
+      "source": "defillama"
+    },
+    "defi:Solana:jupiter-lend:JUPUSD": {
+      "niche_id": "defi:Solana:jupiter-lend:JUPUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "jupiter-lend JUPUSD on Solana",
+      "source": "defillama"
+    },
+    "defi:Solana:jupiter-lend:USDC": {
+      "niche_id": "defi:Solana:jupiter-lend:USDC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "jupiter-lend USDC on Solana",
+      "source": "defillama"
+    },
+    "defi:Solana:ondo-yield-assets:USDY": {
+      "niche_id": "defi:Solana:ondo-yield-assets:USDY",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ondo-yield-assets USDY on Solana",
+      "source": "defillama"
+    },
+    "defi:Solana:sentora-curator:PYUSD": {
+      "niche_id": "defi:Solana:sentora-curator:PYUSD",
+      "first_seen_ms": 1788546389738,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sentora-curator PYUSD on Solana",
+      "source": "defillama"
+    },
+    "defi:Solana:sentora:PYUSD": {
+      "niche_id": "defi:Solana:sentora:PYUSD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "sentora PYUSD on Solana",
+      "source": "defillama"
+    },
+    "defi:Stellar:ondo-yield-assets:USDY": {
+      "niche_id": "defi:Stellar:ondo-yield-assets:USDY",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ondo-yield-assets USDY on Stellar",
+      "source": "defillama"
+    },
+    "defi:Tempo:morpho-blue:SENPATHUSD": {
+      "niche_id": "defi:Tempo:morpho-blue:SENPATHUSD",
+      "first_seen_ms": 1788674386521,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "morpho-blue SENPATHUSD on Tempo",
+      "source": "defillama"
+    },
+    "defi:Tron:justlend-v1:USDD": {
+      "niche_id": "defi:Tron:justlend-v1:USDD",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "justlend-v1 USDD on Tron",
+      "source": "defillama"
+    },
+    "defi:Tron:justlend-v1:USDT": {
+      "niche_id": "defi:Tron:justlend-v1:USDT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "justlend-v1 USDT on Tron",
+      "source": "defillama"
+    },
+    "defi:Tron:stusdt:STUSDT": {
+      "niche_id": "defi:Tron:stusdt:STUSDT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "stusdt STUSDT on Tron",
+      "source": "defillama"
+    },
+    "gh-search:bounty": {
+      "niche_id": "gh-search:bounty",
+      "first_seen_ms": 1787068980291,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "search: label:bounty state:closed",
+      "source": "github-search"
+    },
+    "gh-search:paid-issue": {
+      "niche_id": "gh-search:paid-issue",
+      "first_seen_ms": 1787068980291,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "search: label:\"💎 Bounty\" state:closed",
+      "source": "github-search"
+    },
+    "hf:datasets:reinforcement-learning": {
+      "niche_id": "hf:datasets:reinforcement-learning",
+      "first_seen_ms": 1787068980291,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "hf datasets [reinforcement-learning]",
+      "source": "huggingface"
+    },
+    "hf:datasets:robotics": {
+      "niche_id": "hf:datasets:robotics",
+      "first_seen_ms": 1787068980291,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "hf datasets [robotics]",
+      "source": "huggingface"
+    },
+    "hf:models:any-to-any": {
+      "niche_id": "hf:models:any-to-any",
+      "first_seen_ms": 1787068980291,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "hf models [any-to-any]",
+      "source": "huggingface"
+    },
+    "hf:models:gguf": {
+      "niche_id": "hf:models:gguf",
+      "first_seen_ms": 1787068980291,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "hf models [gguf]",
+      "source": "huggingface"
+    },
+    "hf:models:reinforcement-learning": {
+      "niche_id": "hf:models:reinforcement-learning",
+      "first_seen_ms": 1787068980291,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "hf models [reinforcement-learning]",
+      "source": "huggingface"
+    },
+    "hf:models:robotics": {
+      "niche_id": "hf:models:robotics",
+      "first_seen_ms": 1787068980291,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "hf models [robotics]",
+      "source": "huggingface"
+    },
+    "hf:models:text-generation": {
+      "niche_id": "hf:models:text-generation",
+      "first_seen_ms": 1787068980291,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "hf models [text-generation]",
+      "source": "huggingface"
+    },
+    "hf:models:time-series-forecasting": {
+      "niche_id": "hf:models:time-series-forecasting",
+      "first_seen_ms": 1787068980291,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "hf models [time-series-forecasting]",
+      "source": "huggingface"
+    },
+    "kaggle:ai-agent-security-multi-step-tool-attacks": {
+      "niche_id": "kaggle:ai-agent-security-multi-step-tool-attacks",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1781202699000,
+      "closes_ms": 1788307140000,
+      "label": "AI Agent Security - Multi-Step Tool Attacks",
+      "source": "kaggle"
+    },
+    "kaggle:arc-prize-2026-arc-agi-2": {
+      "niche_id": "kaggle:arc-prize-2026-arc-agi-2",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1774460299000,
+      "closes_ms": 1793663940000,
+      "label": "ARC Prize 2026 - ARC-AGI-2",
+      "source": "kaggle"
+    },
+    "kaggle:arc-prize-2026-arc-agi-3": {
+      "niche_id": "kaggle:arc-prize-2026-arc-agi-3",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1774460303000,
+      "closes_ms": 1793663940000,
+      "label": "ARC Prize 2026 - ARC-AGI-3",
+      "source": "kaggle"
+    },
+    "kaggle:arc-prize-2026-paper-track": {
+      "niche_id": "kaggle:arc-prize-2026-paper-track",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1774460293000,
+      "closes_ms": 1794268740000,
+      "label": "ARC Prize 2026 - Paper Track",
+      "source": "kaggle"
+    },
+    "kaggle:biohub-cell-tracking-during-development": {
+      "niche_id": "kaggle:biohub-cell-tracking-during-development",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1782759673000,
+      "closes_ms": 1790726340000,
+      "label": "Biohub - Cell Tracking During Development",
+      "source": "kaggle"
+    },
+    "kaggle:connectx": {
+      "niche_id": "kaggle:connectx",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1578086759000,
+      "closes_ms": 1893456000000,
+      "label": "Connect X",
+      "source": "kaggle"
+    },
+    "kaggle:contradictory-my-dear-watson": {
+      "niche_id": "kaggle:contradictory-my-dear-watson",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1596142995000,
+      "closes_ms": 1909180740000,
+      "label": "Contradictory, My Dear Watson",
+      "source": "kaggle"
+    },
+    "kaggle:digit-recognizer": {
+      "niche_id": "kaggle:digit-recognizer",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1343249010000,
+      "closes_ms": 1893456000000,
+      "label": "Digit Recognizer",
+      "source": "kaggle"
+    },
+    "kaggle:home-data-for-ml-course": {
+      "niche_id": "kaggle:home-data-for-ml-course",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1531941927000,
+      "closes_ms": 1893542340000,
+      "label": "Housing Prices Competition for Kaggle Learn Users",
+      "source": "kaggle"
+    },
+    "kaggle:house-prices-advanced-regression-techniques": {
+      "niche_id": "kaggle:house-prices-advanced-regression-techniques",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1472519336000,
+      "closes_ms": 1893456000000,
+      "label": "House Prices - Advanced Regression Techniques",
+      "source": "kaggle"
+    },
+    "kaggle:kaggriculture": {
+      "niche_id": "kaggle:kaggriculture",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1785428152000,
+      "closes_ms": 1790812740000,
+      "label": "Kaggriculture",
+      "source": "kaggle"
+    },
+    "kaggle:llm-classification-finetuning": {
+      "niche_id": "kaggle:llm-classification-finetuning",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1729105230000,
+      "closes_ms": 1909180740000,
+      "label": "LLM Classification Finetuning",
+      "source": "kaggle"
+    },
+    "kaggle:nlp-getting-started": {
+      "niche_id": "kaggle:nlp-getting-started",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1577138546000,
+      "closes_ms": 1893456000000,
+      "label": "Natural Language Processing with Disaster Tweets",
+      "source": "kaggle"
+    },
+    "kaggle:playground-series-s6e8": {
+      "niche_id": "kaggle:playground-series-s6e8",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1785542400000,
+      "closes_ms": 1788220740000,
+      "label": "Predicting Smartphone Addiction",
+      "source": "kaggle"
+    },
+    "kaggle:playground-series-s6e9": {
+      "niche_id": "kaggle:playground-series-s6e9",
+      "first_seen_ms": 1788239582210,
+      "opened_ms": 1788220800000,
+      "closes_ms": 1790812740000,
+      "label": "Predicting Electric Vehicle Purchases",
+      "source": "kaggle"
+    },
+    "kaggle:pokemon-tcg-ai-battle-challenge-strategy": {
+      "niche_id": "kaggle:pokemon-tcg-ai-battle-challenge-strategy",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1781607600000,
+      "closes_ms": 1789343940000,
+      "label": "The Pokémon Company - PTCG AI Battle Challenge Strategy",
+      "source": "kaggle"
+    },
+    "kaggle:rsna-knee-abnormality-detection": {
+      "niche_id": "kaggle:rsna-knee-abnormality-detection",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1785945091000,
+      "closes_ms": 1792713540000,
+      "label": "RSNA Knee Abnormality Detection",
+      "source": "kaggle"
+    },
+    "kaggle:spaceship-titanic": {
+      "niche_id": "kaggle:spaceship-titanic",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1645644808000,
+      "closes_ms": 1893456000000,
+      "label": "Spaceship Titanic",
+      "source": "kaggle"
+    },
+    "kaggle:store-sales-time-series-forecasting": {
+      "niche_id": "kaggle:store-sales-time-series-forecasting",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1633542352000,
+      "closes_ms": 1909094340000,
+      "label": "Store Sales - Time Series Forecasting",
+      "source": "kaggle"
+    },
+    "kaggle:titanic": {
+      "niche_id": "kaggle:titanic",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1348866813000,
+      "closes_ms": 1893456000000,
+      "label": "Titanic - Machine Learning from Disaster",
+      "source": "kaggle"
+    },
+    "kaggle:tpu-getting-started": {
+      "niche_id": "kaggle:tpu-getting-started",
+      "first_seen_ms": 1787071793911,
+      "opened_ms": 1592522873000,
+      "closes_ms": 1906761540000,
+      "label": "Petals to the Metal - Flower Classification on TPU",
+      "source": "kaggle"
+    },
+    "perp:hyperliquid:0G": {
+      "niche_id": "perp:hyperliquid:0G",
+      "first_seen_ms": 1788257402625,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "0G perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:AAVE": {
+      "niche_id": "perp:hyperliquid:AAVE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "AAVE perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ACE": {
+      "niche_id": "perp:hyperliquid:ACE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ACE perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ADA": {
+      "niche_id": "perp:hyperliquid:ADA",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ADA perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:AERO": {
+      "niche_id": "perp:hyperliquid:AERO",
+      "first_seen_ms": 1787082121922,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "AERO perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ALGO": {
+      "niche_id": "perp:hyperliquid:ALGO",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ALGO perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:APE": {
+      "niche_id": "perp:hyperliquid:APE",
+      "first_seen_ms": 1787175782092,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "APE perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:APEX": {
+      "niche_id": "perp:hyperliquid:APEX",
+      "first_seen_ms": 1787312658091,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "APEX perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:APT": {
+      "niche_id": "perp:hyperliquid:APT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "APT perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:AR": {
+      "niche_id": "perp:hyperliquid:AR",
+      "first_seen_ms": 1787355679015,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "AR perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ARB": {
+      "niche_id": "perp:hyperliquid:ARB",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ARB perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ASTER": {
+      "niche_id": "perp:hyperliquid:ASTER",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ASTER perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ATOM": {
+      "niche_id": "perp:hyperliquid:ATOM",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ATOM perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:AVAX": {
+      "niche_id": "perp:hyperliquid:AVAX",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "AVAX perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:AXS": {
+      "niche_id": "perp:hyperliquid:AXS",
+      "first_seen_ms": 1787317975954,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "AXS perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:AZTEC": {
+      "niche_id": "perp:hyperliquid:AZTEC",
+      "first_seen_ms": 1788460952415,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "AZTEC perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:BCH": {
+      "niche_id": "perp:hyperliquid:BCH",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "BCH perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:BERA": {
+      "niche_id": "perp:hyperliquid:BERA",
+      "first_seen_ms": 1787158098807,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "BERA perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:BIO": {
+      "niche_id": "perp:hyperliquid:BIO",
+      "first_seen_ms": 1787145039189,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "BIO perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:BLUR": {
+      "niche_id": "perp:hyperliquid:BLUR",
+      "first_seen_ms": 1787355679015,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "BLUR perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:BNB": {
+      "niche_id": "perp:hyperliquid:BNB",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "BNB perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:BOME": {
+      "niche_id": "perp:hyperliquid:BOME",
+      "first_seen_ms": 1787145039189,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "BOME perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:BTC": {
+      "niche_id": "perp:hyperliquid:BTC",
+      "first_seen_ms": 1787085747077,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "BTC perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:CAKE": {
+      "niche_id": "perp:hyperliquid:CAKE",
+      "first_seen_ms": 1787085747077,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "CAKE perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:CASHCAT": {
+      "niche_id": "perp:hyperliquid:CASHCAT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "CASHCAT perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:CC": {
+      "niche_id": "perp:hyperliquid:CC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "CC perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:CFX": {
+      "niche_id": "perp:hyperliquid:CFX",
+      "first_seen_ms": 1787317975954,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "CFX perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:CHIP": {
+      "niche_id": "perp:hyperliquid:CHIP",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "CHIP perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:COMP": {
+      "niche_id": "perp:hyperliquid:COMP",
+      "first_seen_ms": 1787496104368,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "COMP perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:CRV": {
+      "niche_id": "perp:hyperliquid:CRV",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "CRV perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:DASH": {
+      "niche_id": "perp:hyperliquid:DASH",
+      "first_seen_ms": 1787172422986,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "DASH perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:DOGE": {
+      "niche_id": "perp:hyperliquid:DOGE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "DOGE perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:DOT": {
+      "niche_id": "perp:hyperliquid:DOT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "DOT perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:DYDX": {
+      "niche_id": "perp:hyperliquid:DYDX",
+      "first_seen_ms": 1787190783307,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "DYDX perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:EIGEN": {
+      "niche_id": "perp:hyperliquid:EIGEN",
+      "first_seen_ms": 1787158098807,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "EIGEN perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ENA": {
+      "niche_id": "perp:hyperliquid:ENA",
+      "first_seen_ms": 1787082121922,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ENA perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ENS": {
+      "niche_id": "perp:hyperliquid:ENS",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ENS perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ETC": {
+      "niche_id": "perp:hyperliquid:ETC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ETC perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ETH": {
+      "niche_id": "perp:hyperliquid:ETH",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ETH perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ETHFI": {
+      "niche_id": "perp:hyperliquid:ETHFI",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ETHFI perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:FARTCOIN": {
+      "niche_id": "perp:hyperliquid:FARTCOIN",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "FARTCOIN perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:FET": {
+      "niche_id": "perp:hyperliquid:FET",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "FET perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:FIL": {
+      "niche_id": "perp:hyperliquid:FIL",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "FIL perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:GALA": {
+      "niche_id": "perp:hyperliquid:GALA",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "GALA perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:GMX": {
+      "niche_id": "perp:hyperliquid:GMX",
+      "first_seen_ms": 1787499531723,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "GMX perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:GRAM": {
+      "niche_id": "perp:hyperliquid:GRAM",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "GRAM perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:GRASS": {
+      "niche_id": "perp:hyperliquid:GRASS",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "GRASS perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:HBAR": {
+      "niche_id": "perp:hyperliquid:HBAR",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "HBAR perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:HEMI": {
+      "niche_id": "perp:hyperliquid:HEMI",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "HEMI perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:HMSTR": {
+      "niche_id": "perp:hyperliquid:HMSTR",
+      "first_seen_ms": 1788447813181,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "HMSTR perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:HYPE": {
+      "niche_id": "perp:hyperliquid:HYPE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "HYPE perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ICP": {
+      "niche_id": "perp:hyperliquid:ICP",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ICP perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:IMX": {
+      "niche_id": "perp:hyperliquid:IMX",
+      "first_seen_ms": 1787244744700,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "IMX perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:INJ": {
+      "niche_id": "perp:hyperliquid:INJ",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "INJ perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:JTO": {
+      "niche_id": "perp:hyperliquid:JTO",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "JTO perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:JUP": {
+      "niche_id": "perp:hyperliquid:JUP",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "JUP perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:KAITO": {
+      "niche_id": "perp:hyperliquid:KAITO",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "KAITO perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:KAS": {
+      "niche_id": "perp:hyperliquid:KAS",
+      "first_seen_ms": 1787175782092,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "KAS perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:LDO": {
+      "niche_id": "perp:hyperliquid:LDO",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "LDO perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:LINEA": {
+      "niche_id": "perp:hyperliquid:LINEA",
+      "first_seen_ms": 1787248025141,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "LINEA perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:LINK": {
+      "niche_id": "perp:hyperliquid:LINK",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "LINK perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:LIT": {
+      "niche_id": "perp:hyperliquid:LIT",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "LIT perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:LTC": {
+      "niche_id": "perp:hyperliquid:LTC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "LTC perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:MEGA": {
+      "niche_id": "perp:hyperliquid:MEGA",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "MEGA perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:MELANIA": {
+      "niche_id": "perp:hyperliquid:MELANIA",
+      "first_seen_ms": 1787382077680,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "MELANIA perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:MET": {
+      "niche_id": "perp:hyperliquid:MET",
+      "first_seen_ms": 1787104482259,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "MET perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:MINA": {
+      "niche_id": "perp:hyperliquid:MINA",
+      "first_seen_ms": 1787382077680,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "MINA perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:MNT": {
+      "niche_id": "perp:hyperliquid:MNT",
+      "first_seen_ms": 1787082121922,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "MNT perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:MON": {
+      "niche_id": "perp:hyperliquid:MON",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "MON perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:MORPHO": {
+      "niche_id": "perp:hyperliquid:MORPHO",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "MORPHO perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:NEAR": {
+      "niche_id": "perp:hyperliquid:NEAR",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "NEAR perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:NIL": {
+      "niche_id": "perp:hyperliquid:NIL",
+      "first_seen_ms": 1787368143643,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "NIL perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ONDO": {
+      "niche_id": "perp:hyperliquid:ONDO",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ONDO perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:OP": {
+      "niche_id": "perp:hyperliquid:OP",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "OP perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:PAXG": {
+      "niche_id": "perp:hyperliquid:PAXG",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "PAXG perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:PENDLE": {
+      "niche_id": "perp:hyperliquid:PENDLE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "PENDLE perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:PENGU": {
+      "niche_id": "perp:hyperliquid:PENGU",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "PENGU perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:PEOPLE": {
+      "niche_id": "perp:hyperliquid:PEOPLE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "PEOPLE perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:PNUT": {
+      "niche_id": "perp:hyperliquid:PNUT",
+      "first_seen_ms": 1787521052761,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "PNUT perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:POL": {
+      "niche_id": "perp:hyperliquid:POL",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "POL perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:PONS": {
+      "niche_id": "perp:hyperliquid:PONS",
+      "first_seen_ms": 1788184516741,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "PONS perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:POPCAT": {
+      "niche_id": "perp:hyperliquid:POPCAT",
+      "first_seen_ms": 1787179417075,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "POPCAT perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:PUMP": {
+      "niche_id": "perp:hyperliquid:PUMP",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "PUMP perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:PURR": {
+      "niche_id": "perp:hyperliquid:PURR",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "PURR perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:PYTH": {
+      "niche_id": "perp:hyperliquid:PYTH",
+      "first_seen_ms": 1787154466229,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "PYTH perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:RENDER": {
+      "niche_id": "perp:hyperliquid:RENDER",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "RENDER perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:RESOLV": {
+      "niche_id": "perp:hyperliquid:RESOLV",
+      "first_seen_ms": 1787607925360,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "RESOLV perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:RSR": {
+      "niche_id": "perp:hyperliquid:RSR",
+      "first_seen_ms": 1787288153558,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "RSR perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:RUNE": {
+      "niche_id": "perp:hyperliquid:RUNE",
+      "first_seen_ms": 1787136477123,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "RUNE perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:S": {
+      "niche_id": "perp:hyperliquid:S",
+      "first_seen_ms": 1787363495301,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "S perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:SAGA": {
+      "niche_id": "perp:hyperliquid:SAGA",
+      "first_seen_ms": 1787344976238,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "SAGA perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:SEI": {
+      "niche_id": "perp:hyperliquid:SEI",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "SEI perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:SKR": {
+      "niche_id": "perp:hyperliquid:SKR",
+      "first_seen_ms": 1788359514679,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "SKR perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:SKY": {
+      "niche_id": "perp:hyperliquid:SKY",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "SKY perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:SOL": {
+      "niche_id": "perp:hyperliquid:SOL",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "SOL perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:SPX": {
+      "niche_id": "perp:hyperliquid:SPX",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "SPX perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:STABLE": {
+      "niche_id": "perp:hyperliquid:STABLE",
+      "first_seen_ms": 1787147946173,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "STABLE perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:STBL": {
+      "niche_id": "perp:hyperliquid:STBL",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "STBL perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:STRK": {
+      "niche_id": "perp:hyperliquid:STRK",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "STRK perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:STX": {
+      "niche_id": "perp:hyperliquid:STX",
+      "first_seen_ms": 1787492817373,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "STX perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:SUI": {
+      "niche_id": "perp:hyperliquid:SUI",
+      "first_seen_ms": 1787085747077,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "SUI perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:SUSHI": {
+      "niche_id": "perp:hyperliquid:SUSHI",
+      "first_seen_ms": 1788714338020,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "SUSHI perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:SYRUP": {
+      "niche_id": "perp:hyperliquid:SYRUP",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "SYRUP perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:TAO": {
+      "niche_id": "perp:hyperliquid:TAO",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "TAO perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:TIA": {
+      "niche_id": "perp:hyperliquid:TIA",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "TIA perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:TRUMP": {
+      "niche_id": "perp:hyperliquid:TRUMP",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "TRUMP perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:TRX": {
+      "niche_id": "perp:hyperliquid:TRX",
+      "first_seen_ms": 1787082121922,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "TRX perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:UNI": {
+      "niche_id": "perp:hyperliquid:UNI",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "UNI perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:VIRTUAL": {
+      "niche_id": "perp:hyperliquid:VIRTUAL",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "VIRTUAL perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:VVV": {
+      "niche_id": "perp:hyperliquid:VVV",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "VVV perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:W": {
+      "niche_id": "perp:hyperliquid:W",
+      "first_seen_ms": 1787306038809,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "W perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:WIF": {
+      "niche_id": "perp:hyperliquid:WIF",
+      "first_seen_ms": 1787154466229,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "WIF perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:WLD": {
+      "niche_id": "perp:hyperliquid:WLD",
+      "first_seen_ms": 1787082121922,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "WLD perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:WLFI": {
+      "niche_id": "perp:hyperliquid:WLFI",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "WLFI perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:XLM": {
+      "niche_id": "perp:hyperliquid:XLM",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "XLM perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:XMR": {
+      "niche_id": "perp:hyperliquid:XMR",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "XMR perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:XPL": {
+      "niche_id": "perp:hyperliquid:XPL",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "XPL perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:XRP": {
+      "niche_id": "perp:hyperliquid:XRP",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "XRP perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ZEC": {
+      "niche_id": "perp:hyperliquid:ZEC",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ZEC perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ZEN": {
+      "niche_id": "perp:hyperliquid:ZEN",
+      "first_seen_ms": 1788496655455,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ZEN perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ZETA": {
+      "niche_id": "perp:hyperliquid:ZETA",
+      "first_seen_ms": 1787641798528,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ZETA perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ZK": {
+      "niche_id": "perp:hyperliquid:ZK",
+      "first_seen_ms": 1788714338020,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ZK perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ZORA": {
+      "niche_id": "perp:hyperliquid:ZORA",
+      "first_seen_ms": 1787348479510,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ZORA perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:ZRO": {
+      "niche_id": "perp:hyperliquid:ZRO",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "ZRO perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:kBONK": {
+      "niche_id": "perp:hyperliquid:kBONK",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "kBONK perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:kFLOKI": {
+      "niche_id": "perp:hyperliquid:kFLOKI",
+      "first_seen_ms": 1787352196448,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "kFLOKI perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:kLUNC": {
+      "niche_id": "perp:hyperliquid:kLUNC",
+      "first_seen_ms": 1787377467618,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "kLUNC perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:kPEPE": {
+      "niche_id": "perp:hyperliquid:kPEPE",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "kPEPE perp funding",
+      "source": "hyperliquid"
+    },
+    "perp:hyperliquid:kSHIB": {
+      "niche_id": "perp:hyperliquid:kSHIB",
+      "first_seen_ms": 1787079474370,
+      "opened_ms": null,
+      "closes_ms": null,
+      "label": "kSHIB perp funding",
+      "source": "hyperliquid"
+    }
+  }
+}
